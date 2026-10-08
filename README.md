@@ -87,6 +87,20 @@ docker compose exec backend python manage.py setup_clinic --name-en ... --name-a
 
 This starts PostgreSQL, the API, the web app on port 8080 and a daily backup job. Put HTTPS in front of port 8080, and copy the backups volume off the server (cloud storage or a second machine). A backup on the same disk does not protect against losing that disk.
 
+## Deploy a test server on Render
+
+`render.yaml` sets up one web service (API and web app in one container, from the root `Dockerfile`) and a PostgreSQL database.
+
+1. In Render, choose **New > Blueprint** and pick this repository.
+2. Enter a password for `INITIAL_OWNER_PASSWORD` when asked.
+3. When the deploy finishes, open the `onrender.com` address and sign in as `amin`.
+
+On first start the container creates the clinic, the six roles, the owner account and the starter procedure catalog. Later deploys leave the data alone.
+
+Limits of the free plans: the app sleeps after a while without visits and takes a little time to wake, the free database is deleted after a set period unless upgraded, and uploaded files are lost on each redeploy. That is fine for trying it out, not for real patient data.
+
+The same `Dockerfile` runs on any host that builds containers (Railway, Fly.io, a VPS). It needs `DATABASE_URL`, `DJANGO_SECRET_KEY` and, for the first start, `INITIAL_OWNER_USERNAME` and `INITIAL_OWNER_PASSWORD`.
+
 ## Not done yet
 
 - API error messages are in English only. Screen text is in both languages.

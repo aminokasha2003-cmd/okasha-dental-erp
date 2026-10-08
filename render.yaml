@@ -1,0 +1,29 @@
+# Render blueprint for a test server: one web service (API + web app) and a PostgreSQL database.
+# In Render: New > Blueprint > pick this repository. You will be asked for the owner password.
+services:
+  - type: web
+    name: okasha-erp
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health/
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: okasha-erp-db
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: INITIAL_OWNER_USERNAME
+        value: amin
+      - key: INITIAL_OWNER_PASSWORD
+        sync: false
+      - key: INITIAL_LANGUAGE
+        value: ar
+databases:
+  - name: okasha-erp-db
+    plan: free
+    databaseName: okasha_erp
+    user: okasha

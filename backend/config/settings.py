@@ -7,6 +7,7 @@ code runs in development and production. See ../.env.example.
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +33,10 @@ def env_list(name, default=""):
 DEBUG = env_bool("DJANGO_DEBUG", False)
 SECRET_KEY = env("DJANGO_SECRET_KEY", "dev-only-insecure-key" if DEBUG else None, required=not DEBUG)
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+# Hosting platforms that publish the app's hostname (Render) are allowed automatically.
+if env("RENDER_EXTERNAL_HOSTNAME"):
+    ALLOWED_HOSTS.append(env("RENDER_EXTERNAL_HOSTNAME"))
+CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host not in {"localhost", "127.0.0.1"}]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -79,17 +84,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
+def database_from_url(url):
+    parts = urlparse(url)
+    return {
+        "NAME": parts.path.lstrip("/"),
+        "USER": unquote(parts.username or ""),
+        "PASSWORD": unquote(parts.password or ""),
+        "HOST": parts.hostname or "",
+        "PORT": str(parts.port or 5432),
+    }
+
+
+# DATABASE_URL (set by most hosting platforms) wins over the separate POSTGRES_* variables.
+_db = (
+    database_from_url(env("DATABASE_URL"))
+    if env("DATABASE_URL")
+    else {
         "NAME": env("POSTGRES_DB", "okasha_erp"),
         "USER": env("POSTGRES_USER", "postgres"),
         "PASSWORD": env("POSTGRES_PASSWORD", ""),
         "HOST": env("POSTGRES_HOST", "localhost"),
         "PORT": env("POSTGRES_PORT", "5432"),
-        "CONN_MAX_AGE": 60,
     }
-}
+)
+DATABASES = {"default": {"ENGINE": "django.db.backends.postgresql", "CONN_MAX_AGE": 60, **_db}}
 
 AUTH_USER_MODEL = "core.User"
 
@@ -111,6 +129,10 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
 MEDIA_ROOT = Path(env("MEDIA_ROOT", str(BASE_DIR / "media")))
+# The built web app (frontend/dist). When present, Django serves it too, so the
+# whole system can run as one service.
+FRONTEND_DIST = Path(env("FRONTEND_DIST", str(BASE_DIR.parent / "frontend" / "dist")))
+WHITENOISE_ROOT = FRONTEND_DIST if FRONTEND_DIST.exists() else None
 BACKUP_DIR = Path(env("BACKUP_DIR", str(BASE_DIR / "backups")))
 BACKUP_KEEP_DAYS = int(env("BACKUP_KEEP_DAYS", "30"))
 
