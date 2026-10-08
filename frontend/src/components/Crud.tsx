@@ -11,7 +11,7 @@ export interface Option {
 export interface FieldDef {
   name: string;
   label: TKey;
-  type?: "text" | "textarea" | "number" | "checkbox" | "select" | "multiselect" | "time" | "color" | "password" | "email";
+  type?: "text" | "textarea" | "number" | "checkbox" | "select" | "multiselect" | "time" | "date" | "color" | "password" | "email";
   options?: Option[];
   required?: boolean;
   hint?: TKey;

@@ -131,11 +131,20 @@ class MeSerializer(serializers.ModelSerializer):
     clinic = ClinicSerializer(read_only=True)
     permissions = serializers.SerializerMethodField()
     roles = serializers.SerializerMethodField()
+    staff_member = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "email", "phone", "language", "clinic", "roles", "permissions"]
-        read_only_fields = ["id", "username", "clinic", "roles", "permissions"]
+        fields = [
+            "id", "username", "first_name", "last_name", "email", "phone", "language",
+            "clinic", "roles", "permissions", "staff_member",
+        ]
+        read_only_fields = ["id", "username", "clinic", "roles", "permissions", "staff_member"]
+
+    def get_staff_member(self, obj):
+        """The staff directory entry linked to this login (a dentist's calendar defaults to it)."""
+        profile = getattr(obj, "staff_profile", None)
+        return {"id": profile.id, "staff_type": profile.staff_type} if profile else None
 
     def get_permissions(self, obj):
         return obj.module_permissions()

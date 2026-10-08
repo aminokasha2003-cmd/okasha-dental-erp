@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Okasha Dental — Patient card (design reference)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@400;500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F4A61}a:hover{color:#16242F}
+.ok-pattern{background-image:url(assets/okasha-pattern-light.svg);background-size:168px 148px;background-repeat:repeat}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #7FA3C2;outline-offset:2px}
+</style>
+</head>
+<body>
+<div style="position: relative; overflow: hidden; background: #F3F6F9; color: #16242F; font-family: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif; font-size: 14px; line-height: 1.45; min-height: 100vh">
+
+<div class="ok-pattern" aria-hidden="true" style="position: absolute; inset: 0; opacity: 1"></div>
+
+<img src="assets/okasha-mark.svg" alt="" aria-hidden="true" style="position: absolute; top: 40px; right: -150px; width: 760px; height: auto; opacity: 0.07; pointer-events: none">
+
+
+<header style="position: relative; background: #FFFFFF; border-bottom: 1px solid #DCE4EB">
+<div style="max-width: 1376px; margin: 0 auto; padding: 10px 32px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px">
+<a href="#top" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #16242F; min-height: 44px">
+<img src="assets/okasha-logo.svg" alt="Okasha Dental Clinic" style="height: 40px; width: auto; display: block">
+<span style="display: flex; flex-direction: column; gap: 0">
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 17px; letter-spacing: 0.01em; line-height: 1.15">Okasha Dental</span>
+<span style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #5A6B7B">Clinic ERP</span>
+</span>
+</a>
+<nav aria-label="Breadcrumb" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #5A6B7B; flex: 1 1 200px">
+<a href="#top" style="text-decoration: none; padding: 12px 0">Patients</a>
+<span aria-hidden="true">/</span>
+<span style="color: #16242F; font-weight: 500">Mariam Hassan</span>
+</nav>
+<div style="display: flex; align-items: center; gap: 8px; flex: 0 1 320px; background: #F3F6F9; border: 1px solid #DCE4EB; border-radius: 10px; padding: 0 12px; height: 44px; box-sizing: border-box">
+<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5A6B7B" aria-hidden="true" style="stroke-width: 1.8; stroke-linecap: round; flex: none"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+<label for="pc-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%)">Search patients</label>
+<input id="pc-search" type="search" placeholder="Search name, phone or file no." style="flex: 1 1 auto; min-width: 0; border: 0; background: transparent; font: inherit; color: #16242F; height: 40px">
+</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="width: 36px; height: 36px; border-radius: 50%; background: #446681; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 13px">AO</span>
+<span style="font-size: 13px; font-weight: 500">Dr. Amin Okasha</span>
+</div>
+</div>
+</header>
+
+<main id="top" style="position: relative; max-width: 1376px; margin: 0 auto; padding: 24px 32px 56px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<section aria-label="Patient summary" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); overflow: hidden">
+<div style="padding: 24px 28px; display: flex; flex-wrap: wrap; gap: 20px 28px; align-items: flex-start">
+<div style="width: 76px; height: 76px; border-radius: 50%; background: #E6EDF3; border: 2px solid #446681; color: #2F4A61; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 26px; flex: none">MH</div>
+<div style="flex: 999 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px">
+<h1 style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 32px; line-height: 1.1; letter-spacing: -0.01em">Mariam Hassan</h1>
+<span lang="ar" dir="rtl" style="font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; font-size: 18px; color: #5A6B7B">مريم حسن</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; color: #3A4B5A; font-size: 14px">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; background: #E6EDF3; color: #2F4A61; border-radius: 6px; padding: 3px 8px">P-00482</span>
+<span>Female</span>
+<span>34 years</span>
+<span>+20 100 555 0142</span>
+<span style="color: #5A6B7B">Patient since Mar 2023</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="display: inline-flex; align-items: center; gap: 8px; background: #FDECEC; color: #B91414; border: 1px solid #F3B4B4; border-radius: 999px; padding: 5px 12px 5px 10px; font-size: 13px; font-weight: 600"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #E61B1B"></span>Allergy: Penicillin</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; background: #FDECEC; color: #B91414; border: 1px solid #F3B4B4; border-radius: 999px; padding: 5px 12px 5px 10px; font-size: 13px; font-weight: 600"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #E61B1B"></span>Type 2 diabetes</span>
+<span style="display: inline-flex; align-items: center; background: #F3F6F9; color: #3A4B5A; border: 1px solid #DCE4EB; border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 500">On Metformin</span>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<button type="button" style="height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid #446681; background: #446681; color: #FFFFFF; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width: 2; stroke-linecap: round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>New visit</button>
+<button type="button" style="height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid #C3D0DB; background: #FFFFFF; color: #16242F; font-size: 14px; font-weight: 500">Book appointment</button>
+<button type="button" style="height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid #C3D0DB; background: #FFFFFF; color: #16242F; font-size: 14px; font-weight: 500">Add payment</button>
+<button type="button" aria-label="Print patient card" style="height: 44px; width: 44px; border-radius: 10px; border: 1px solid #C3D0DB; background: #FFFFFF; color: #16242F; display: inline-flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M7 9V4h10v5"></path><rect x="4" y="9" width="16" height="8" rx="2"></rect><path d="M7 14h10v6H7z"></path></svg></button>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 1px; background: #DCE4EB; border-top: 1px solid #DCE4EB">
+<div style="background: #FFFFFF; padding: 16px 28px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B; font-weight: 500">Last visit</span>
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-size: 19px; font-weight: 600">28 Sep 2026</span>
+<span style="font-size: 13px; color: #3A4B5A">Root canal treatment, tooth 26</span>
+</div>
+<div style="background: #FFFFFF; padding: 16px 28px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B; font-weight: 500">Next appointment</span>
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-size: 19px; font-weight: 600">Tue 13 Oct, 5:30 PM</span>
+<span style="font-size: 13px; color: #3A4B5A">Crown try-in, tooth 26</span>
+</div>
+<div style="background: #FFFFFF; padding: 16px 28px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B; font-weight: 500">Treatment plan</span>
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-size: 19px; font-weight: 600">3 of 7 done</span>
+<div role="img" aria-label="3 of 7 procedures done, 1 in progress" style="display: flex; gap: 3px; margin-top: 4px">
+<span style="flex: 1 1 0; height: 6px; border-radius: 3px; background: #446681"></span>
+<span style="flex: 1 1 0; height: 6px; border-radius: 3px; background: #446681"></span>
+<span style="flex: 1 1 0; height: 6px; border-radius: 3px; background: #446681"></span>
+<span style="flex: 1 1 0; height: 6px; border-radius: 3px; background: #E08A1E"></span>
+<span style="flex: 1 1 0; height: 6px; border-radius: 3px; background: #DCE4EB"></span>
+<span style="flex: 1 1 0; height: 6px; border-radius: 3px; background: #DCE4EB"></span>
+<span style="flex: 1 1 0; height: 6px; border-radius: 3px; background: #DCE4EB"></span>
+</div>
+</div>
+<div style="background: #FFFFFF; padding: 16px 28px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B; font-weight: 500">Balance due</span>
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-size: 19px; font-weight: 600">EGP 4,500</span>
+<span style="font-size: 13px; color: #3A4B5A">EGP 13,000 paid of 17,500 billed</span>
+</div>
+</div>
+</section>
+
+<nav aria-label="Patient card sections" style="display: flex; flex-wrap: wrap; gap: 4px; background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 12px; padding: 4px">
+<a href="#chart" style="min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 9px; background: #446681; color: #FFFFFF; font-weight: 600; text-decoration: none">Dental chart</a>
+<a href="#plan" style="min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 9px; color: #3A4B5A; font-weight: 500; text-decoration: none">Treatment plan</a>
+<a href="#visits" style="min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 9px; color: #3A4B5A; font-weight: 500; text-decoration: none">Visits</a>
+<a href="#billing" style="min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 9px; color: #3A4B5A; font-weight: 500; text-decoration: none">Billing</a>
+<a href="#medical" style="min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 9px; color: #3A4B5A; font-weight: 500; text-decoration: none">Medical history</a>
+<a href="#lab" style="min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 9px; color: #3A4B5A; font-weight: 500; text-decoration: none">Lab orders</a>
+<a href="#files" style="min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 9px; color: #3A4B5A; font-weight: 500; text-decoration: none">Files</a>
+<a href="#notes" style="min-height: 44px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 9px; color: #3A4B5A; font-weight: 500; text-decoration: none">Notes</a>
+</nav>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<section id="chart" aria-labelledby="chart-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 24px 28px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<h2 id="chart-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 20px">Dental chart</h2>
+<span style="font-size: 13px; color: #5A6B7B">FDI numbering, permanent teeth. Select a tooth to see its record.</span>
+</div>
+<span style="font-size: 13px; color: #5A6B7B">Updated 28 Sep 2026</span>
+</div>
+
+<div style="overflow-x: auto; border: 1px solid #DCE4EB; border-radius: 12px; background: #F7F9FB">
+<div style="min-width: 800px; padding: 16px 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B; font-weight: 500; padding: 0 4px">
+<span>Patient's right</span>
+<span>Upper</span>
+<span>Patient's left</span>
+</div>
+<div style="display: flex; align-items: stretch; gap: 10px">
+<div style="flex: 1 1 0; display: flex; gap: 2px">
+
+<button type="button" data-tooth="18" aria-label="Tooth 18, Upper right third molar, Missing" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">18</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="#7F95A8" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="#7F95A8" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="17" aria-label="Tooth 17, Upper right second molar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">17</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="16" aria-label="Tooth 16, Upper right first molar, Filling" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">16</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#A9C0D3" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="15" aria-label="Tooth 15, Upper right second premolar, Caries · Filling planned" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">15</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#E08A1E" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="14" aria-label="Tooth 14, Upper right first premolar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">14</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="13" aria-label="Tooth 13, Upper right canine, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">13</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="12" aria-label="Tooth 12, Upper right lateral incisor, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">12</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="11" aria-label="Tooth 11, Upper right central incisor, Crown · Root canal treated" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px">RCT</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">11</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+</div>
+<div aria-hidden="true" style="width: 2px; background: #C3D0DB; border-radius: 1px"></div>
+<div style="flex: 1 1 0; display: flex; gap: 2px">
+
+<button type="button" data-tooth="21" aria-label="Tooth 21, Upper left central incisor, Filling" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">21</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#A9C0D3" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="22" aria-label="Tooth 22, Upper left lateral incisor, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">22</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="23" aria-label="Tooth 23, Upper left canine, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">23</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="24" aria-label="Tooth 24, Upper left first premolar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">24</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="25" aria-label="Tooth 25, Upper left second premolar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">25</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="26" aria-label="Tooth 26, Upper left first molar, Root canal treated · Crown in progress" aria-pressed="true" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid #446681; background: #E6EDF3; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px">RCT</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">26</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#16242F" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="27" aria-label="Tooth 27, Upper left second molar, Caries · Filling planned" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">27</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#E08A1E" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+<button type="button" data-tooth="28" aria-label="Tooth 28, Upper left third molar, Missing" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 5px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">28</span>
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="#7F95A8" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="#7F95A8" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+</button>
+
+</div>
+</div>
+<div aria-hidden="true" style="height: 2px; background: #C3D0DB; border-radius: 1px"></div>
+<div style="display: flex; align-items: stretch; gap: 10px">
+<div style="flex: 1 1 0; display: flex; gap: 2px">
+
+<button type="button" data-tooth="48" aria-label="Tooth 48, Lower right third molar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">48</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="47" aria-label="Tooth 47, Lower right second molar, Filling" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#A9C0D3" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">47</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="46" aria-label="Tooth 46, Lower right first molar, Missing · Implant planned" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="transparent" stroke="#C3D0DB" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="#7F95A8" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="#7F95A8" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">46</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="45" aria-label="Tooth 45, Lower right second premolar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">45</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="44" aria-label="Tooth 44, Lower right first premolar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">44</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="43" aria-label="Tooth 43, Lower right canine, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">43</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="42" aria-label="Tooth 42, Lower right lateral incisor, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">42</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="41" aria-label="Tooth 41, Lower right central incisor, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">41</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+</div>
+<div aria-hidden="true" style="width: 2px; background: #C3D0DB; border-radius: 1px"></div>
+<div style="flex: 1 1 0; display: flex; gap: 2px">
+
+<button type="button" data-tooth="31" aria-label="Tooth 31, Lower left central incisor, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">31</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="32" aria-label="Tooth 32, Lower left lateral incisor, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">32</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="33" aria-label="Tooth 33, Lower left canine, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">33</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="34" aria-label="Tooth 34, Lower left first premolar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">34</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="35" aria-label="Tooth 35, Lower left second premolar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">35</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="36" aria-label="Tooth 36, Lower left first molar, Implant with crown" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#446681" stroke="#2F4A61" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">36</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px">IMP</span>
+</button>
+
+<button type="button" data-tooth="37" aria-label="Tooth 37, Lower left second molar, Filling" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#A9C0D3" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#A9C0D3" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">37</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+<button type="button" data-tooth="38" aria-label="Tooth 38, Lower left third molar, Sound" aria-pressed="false" style="flex: 1 1 0; min-width: 44px; padding: 6px 0 5px; display: flex; flex-direction: column; align-items: center; gap: 3px; border-radius: 9px; border: 2px solid transparent; background: transparent; color: #16242F">
+<svg viewBox="0 0 40 40" width="34" height="34" aria-hidden="true" style="display: block">
+<polygon points="2,2 38,2 27,13 13,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,2 38,38 27,27 27,13" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="38,38 2,38 13,27 27,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<polygon points="2,38 2,2 13,13 13,27" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4; stroke-linejoin: round"></polygon>
+<rect x="13" y="13" width="14" height="14" fill="#FFFFFF" stroke="#7F95A8" style="stroke-width: 1.4"></rect>
+<line x1="7" y1="7" x2="33" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+<line x1="33" y1="7" x2="7" y2="33" stroke="transparent" style="stroke-width: 2.2; stroke-linecap: round"></line>
+</svg>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500">38</span>
+<span style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: #3A4B5A; height: 12px"></span>
+</button>
+
+</div>
+</div>
+<div style="display: flex; justify-content: center; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B; font-weight: 500">
+<span>Lower</span>
+</div>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: #3A4B5A">
+<span style="display: inline-flex; align-items: center; gap: 7px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 3px; background: #FFFFFF; border: 1.5px solid #7F95A8; box-sizing: border-box"></span>Sound</span>
+<span style="display: inline-flex; align-items: center; gap: 7px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 3px; background: #E08A1E; border: 1.5px solid #7F95A8; box-sizing: border-box"></span>Caries</span>
+<span style="display: inline-flex; align-items: center; gap: 7px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 3px; background: #A9C0D3; border: 1.5px solid #7F95A8; box-sizing: border-box"></span>Filling</span>
+<span style="display: inline-flex; align-items: center; gap: 7px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 3px; background: #446681; border: 1.5px solid #446681; box-sizing: border-box"></span>Crown</span>
+<span style="display: inline-flex; align-items: center; gap: 7px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 3px; background: #16242F; border: 1.5px solid #16242F; box-sizing: border-box"></span>Root canal (RCT)</span>
+<span style="display: inline-flex; align-items: center; gap: 7px"><span aria-hidden="true" style="font-size: 9px; font-weight: 600; letter-spacing: 0.06em; border: 1.5px solid #7F95A8; border-radius: 3px; padding: 0 3px; line-height: 13px">IMP</span>Implant</span>
+<span style="display: inline-flex; align-items: center; gap: 7px"><svg viewBox="0 0 14 14" width="14" height="14" aria-hidden="true"><line x1="2" y1="2" x2="12" y2="12" stroke="#7F95A8" style="stroke-width: 2; stroke-linecap: round"></line><line x1="12" y1="2" x2="2" y2="12" stroke="#7F95A8" style="stroke-width: 2; stroke-linecap: round"></line></svg>Missing</span>
+</div>
+
+<div aria-live="polite" style="border: 1px solid #C3D0DB; border-radius: 12px; padding: 16px 18px; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; background: #FFFFFF">
+<div style="width: 56px; height: 56px; border-radius: 12px; background: #E6EDF3; color: #2F4A61; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 22px; font-weight: 500; flex: none"><span data-sel="n">26</span></div>
+<div style="flex: 999 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 17px"><span data-sel="name">Tooth 26 · Upper left first molar</span></span>
+<span style="font-size: 13px; font-weight: 600; color: #2F4A61"><span data-sel="status">Root canal treated · Crown in progress</span></span>
+<span style="font-size: 13px; color: #3A4B5A"><span data-sel="note">Three canals obturated 28 Sep 2026. Temporary filling in place. Crown LAB-0312 is being milled.</span></span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #446681; background: #FFFFFF; color: #2F4A61; font-size: 14px; font-weight: 600">Add procedure</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #C3D0DB; background: #FFFFFF; color: #16242F; font-size: 14px; font-weight: 500">Edit surfaces</button>
+</div>
+</div>
+</section>
+
+<section id="plan" aria-labelledby="plan-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 24px 28px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px">
+<h2 id="plan-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 20px">Treatment plan</h2>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #C3D0DB; background: #FFFFFF; color: #16242F; font-size: 14px; font-weight: 500">Add procedure</button>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px">
+<thead>
+<tr style="text-align: left; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B">
+<th scope="col" style="padding: 8px 12px 8px 0; font-weight: 500; border-bottom: 1px solid #C3D0DB; width: 64px">Tooth</th>
+<th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #C3D0DB">Procedure</th>
+<th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #C3D0DB">Status</th>
+<th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #C3D0DB">Date</th>
+<th scope="col" style="padding: 8px 0 8px 12px; font-weight: 500; border-bottom: 1px solid #C3D0DB; text-align: right">Fee (EGP)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 13px 12px 13px 0; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace">11</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3">Root canal treatment</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3"><span style="display: inline-block; background: #E6EDF3; color: #2F4A61; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600">Done</span></td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3; color: #3A4B5A">21 Jun 2026</td>
+<td style="padding: 13px 0 13px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">2,500</td>
+</tr>
+<tr>
+<td style="padding: 13px 12px 13px 0; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace">11</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3">Zirconia crown</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3"><span style="display: inline-block; background: #E6EDF3; color: #2F4A61; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600">Done</span></td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3; color: #3A4B5A">19 Jul 2026</td>
+<td style="padding: 13px 0 13px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">6,000</td>
+</tr>
+<tr>
+<td style="padding: 13px 12px 13px 0; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace">26</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3">Root canal treatment</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3"><span style="display: inline-block; background: #E6EDF3; color: #2F4A61; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600">Done</span></td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3; color: #3A4B5A">28 Sep 2026</td>
+<td style="padding: 13px 0 13px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">3,000</td>
+</tr>
+<tr>
+<td style="padding: 13px 12px 13px 0; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace">26</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3">Zirconia crown</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3"><span style="display: inline-block; background: #FCF1E0; color: #8A4F00; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600">In progress</span></td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3; color: #3A4B5A">Try-in 13 Oct 2026</td>
+<td style="padding: 13px 0 13px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">6,000</td>
+</tr>
+<tr>
+<td style="padding: 13px 12px 13px 0; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace">15</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3">Composite filling, distal</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3"><span style="display: inline-block; background: #FFFFFF; color: #3A4B5A; border: 1px solid #C3D0DB; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600">Planned</span></td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3; color: #5A6B7B">Not scheduled</td>
+<td style="padding: 13px 0 13px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">1,200</td>
+</tr>
+<tr>
+<td style="padding: 13px 12px 13px 0; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace">27</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3">Composite filling, occlusal</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3"><span style="display: inline-block; background: #FFFFFF; color: #3A4B5A; border: 1px solid #C3D0DB; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600">Planned</span></td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #E6EDF3; color: #5A6B7B">Not scheduled</td>
+<td style="padding: 13px 0 13px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">1,200</td>
+</tr>
+<tr>
+<td style="padding: 13px 12px 13px 0; border-bottom: 1px solid #C3D0DB; font-family: 'IBM Plex Mono', ui-monospace, monospace">46</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #C3D0DB">Implant with zirconia crown</td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #C3D0DB"><span style="display: inline-block; background: #FFFFFF; color: #3A4B5A; border: 1px solid #C3D0DB; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600">Planned</span></td>
+<td style="padding: 13px 12px; border-bottom: 1px solid #C3D0DB; color: #5A6B7B">Not scheduled</td>
+<td style="padding: 13px 0 13px 12px; border-bottom: 1px solid #C3D0DB; text-align: right; font-variant-numeric: tabular-nums">22,000</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4" style="padding: 12px 12px 4px 0; color: #3A4B5A">Done and in progress</td>
+<td style="padding: 12px 0 4px 12px; text-align: right; font-variant-numeric: tabular-nums">17,500</td>
+</tr>
+<tr>
+<td colspan="4" style="padding: 4px 12px 4px 0; color: #3A4B5A">Planned, not yet billed</td>
+<td style="padding: 4px 0 4px 12px; text-align: right; font-variant-numeric: tabular-nums">24,400</td>
+</tr>
+<tr>
+<td colspan="4" style="padding: 4px 12px 0 0; font-weight: 600">Plan total</td>
+<td style="padding: 4px 0 0 12px; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums">41,900</td>
+</tr>
+</tfoot>
+</table>
+</div>
+</section>
+
+<section id="visits" aria-labelledby="visits-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 24px 28px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px">
+<h2 id="visits-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 20px">Visit history</h2>
+<span style="font-size: 13px; color: #5A6B7B">5 visits</span>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0">
+<li style="display: flex; gap: 16px">
+<div aria-hidden="true" style="display: flex; flex-direction: column; align-items: center; flex: none; width: 14px"><span style="width: 12px; height: 12px; border-radius: 50%; background: #446681; margin-top: 4px"></span><span style="flex: 1 1 auto; width: 2px; background: #DCE4EB"></span></div>
+<div style="flex: 1 1 auto; min-width: 0; padding-bottom: 18px; display: flex; flex-wrap: wrap; gap: 4px 20px">
+<span style="flex: 0 0 104px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; color: #3A4B5A">28 Sep 2026</span>
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">Root canal treatment, tooth 26</span>
+<span style="font-size: 13px; color: #3A4B5A">Three canals obturated. Temporary filling placed. Crown advised and scan taken.</span>
+<span style="font-size: 12px; color: #5A6B7B">Dr. Amin Okasha</span>
+</div>
+</div>
+</li>
+<li style="display: flex; gap: 16px">
+<div aria-hidden="true" style="display: flex; flex-direction: column; align-items: center; flex: none; width: 14px"><span style="width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF; border: 2px solid #446681; box-sizing: border-box; margin-top: 4px"></span><span style="flex: 1 1 auto; width: 2px; background: #DCE4EB"></span></div>
+<div style="flex: 1 1 auto; min-width: 0; padding-bottom: 18px; display: flex; flex-wrap: wrap; gap: 4px 20px">
+<span style="flex: 0 0 104px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; color: #3A4B5A">19 Jul 2026</span>
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">Zirconia crown cemented, tooth 11</span>
+<span style="font-size: 13px; color: #3A4B5A">Shade A2. Contacts and occlusion checked.</span>
+<span style="font-size: 12px; color: #5A6B7B">Dr. Amin Okasha</span>
+</div>
+</div>
+</li>
+<li style="display: flex; gap: 16px">
+<div aria-hidden="true" style="display: flex; flex-direction: column; align-items: center; flex: none; width: 14px"><span style="width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF; border: 2px solid #446681; box-sizing: border-box; margin-top: 4px"></span><span style="flex: 1 1 auto; width: 2px; background: #DCE4EB"></span></div>
+<div style="flex: 1 1 auto; min-width: 0; padding-bottom: 18px; display: flex; flex-wrap: wrap; gap: 4px 20px">
+<span style="flex: 0 0 104px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; color: #3A4B5A">05 Jul 2026</span>
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">Crown preparation and digital scan, tooth 11</span>
+<span style="font-size: 13px; color: #3A4B5A">Temporary crown fitted. Scan sent to the in-house lab.</span>
+<span style="font-size: 12px; color: #5A6B7B">Dr. Amin Okasha</span>
+</div>
+</div>
+</li>
+<li style="display: flex; gap: 16px">
+<div aria-hidden="true" style="display: flex; flex-direction: column; align-items: center; flex: none; width: 14px"><span style="width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF; border: 2px solid #446681; box-sizing: border-box; margin-top: 4px"></span><span style="flex: 1 1 auto; width: 2px; background: #DCE4EB"></span></div>
+<div style="flex: 1 1 auto; min-width: 0; padding-bottom: 18px; display: flex; flex-wrap: wrap; gap: 4px 20px">
+<span style="flex: 0 0 104px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; color: #3A4B5A">21 Jun 2026</span>
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">Root canal treatment, tooth 11</span>
+<span style="font-size: 13px; color: #3A4B5A">Single canal. Completed in one visit.</span>
+<span style="font-size: 12px; color: #5A6B7B">Dr. Amin Okasha</span>
+</div>
+</div>
+</li>
+<li style="display: flex; gap: 16px">
+<div aria-hidden="true" style="display: flex; flex-direction: column; align-items: center; flex: none; width: 14px"><span style="width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF; border: 2px solid #446681; box-sizing: border-box; margin-top: 4px"></span></div>
+<div style="flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px 20px">
+<span style="flex: 0 0 104px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; color: #3A4B5A">14 Jun 2026</span>
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600">Examination and panoramic X-ray</span>
+<span style="font-size: 13px; color: #3A4B5A">Full charting. Treatment plan explained and agreed.</span>
+<span style="font-size: 12px; color: #5A6B7B">Dr. Amin Okasha</span>
+</div>
+</div>
+</li>
+</ol>
+</section>
+
+<section id="billing" aria-labelledby="billing-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 24px 28px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px">
+<h2 id="billing-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 20px">Billing and payments</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #C3D0DB; background: #FFFFFF; color: #16242F; font-size: 14px; font-weight: 500">Print statement</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #446681; background: #446681; color: #FFFFFF; font-size: 14px; font-weight: 600">Add payment</button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px">
+<div style="border: 1px solid #DCE4EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B; font-weight: 500">Billed to date</span>
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-size: 24px; font-weight: 600">EGP 17,500</span>
+</div>
+<div style="border: 1px solid #DCE4EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B; font-weight: 500">Paid</span>
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-size: 24px; font-weight: 600">EGP 13,000</span>
+</div>
+<div style="border: 1px solid #446681; background: #E6EDF3; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #2F4A61; font-weight: 600">Balance due</span>
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-size: 24px; font-weight: 600">EGP 4,500</span>
+</div>
+</div>
+<div role="img" aria-label="EGP 13,000 of 17,500 paid" style="height: 8px; border-radius: 4px; background: #DCE4EB; overflow: hidden"><div style="width: 74.3%; height: 100%; background: #446681"></div></div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px">
+<thead>
+<tr style="text-align: left; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #5A6B7B">
+<th scope="col" style="padding: 8px 12px 8px 0; font-weight: 500; border-bottom: 1px solid #C3D0DB">Date</th>
+<th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #C3D0DB">Receipt</th>
+<th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #C3D0DB">For</th>
+<th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #C3D0DB">Method</th>
+<th scope="col" style="padding: 8px 0 8px 12px; font-weight: 500; border-bottom: 1px solid #C3D0DB; text-align: right">Amount (EGP)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 12px 12px 12px 0; border-bottom: 1px solid #E6EDF3; color: #3A4B5A">28 Sep 2026</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px">R-1164</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3">Crown deposit, tooth 26</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3">InstaPay</td>
+<td style="padding: 12px 0 12px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">1,500</td>
+</tr>
+<tr>
+<td style="padding: 12px 12px 12px 0; border-bottom: 1px solid #E6EDF3; color: #3A4B5A">28 Sep 2026</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px">R-1163</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3">Root canal treatment, tooth 26</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3">Cash</td>
+<td style="padding: 12px 0 12px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">3,000</td>
+</tr>
+<tr>
+<td style="padding: 12px 12px 12px 0; border-bottom: 1px solid #E6EDF3; color: #3A4B5A">19 Jul 2026</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px">R-1090</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3">Crown balance, tooth 11</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3">Card</td>
+<td style="padding: 12px 0 12px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">3,000</td>
+</tr>
+<tr>
+<td style="padding: 12px 12px 12px 0; border-bottom: 1px solid #E6EDF3; color: #3A4B5A">05 Jul 2026</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px">R-1067</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3">Crown deposit, tooth 11</td>
+<td style="padding: 12px; border-bottom: 1px solid #E6EDF3">InstaPay</td>
+<td style="padding: 12px 0 12px 12px; border-bottom: 1px solid #E6EDF3; text-align: right; font-variant-numeric: tabular-nums">3,000</td>
+</tr>
+<tr>
+<td style="padding: 12px 12px 12px 0; color: #3A4B5A">21 Jun 2026</td>
+<td style="padding: 12px; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px">R-1041</td>
+<td style="padding: 12px">Root canal treatment, tooth 11</td>
+<td style="padding: 12px">Cash</td>
+<td style="padding: 12px 0 12px 12px; text-align: right; font-variant-numeric: tabular-nums">2,500</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+</div>
+
+<aside style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<section id="medical" aria-labelledby="medical-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="medical-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 18px">Medical history</h2>
+<span style="font-size: 12px; color: #5A6B7B">Reviewed 28 Sep 2026</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 12px; align-items: flex-start; background: #FDECEC; border: 1px solid #F3B4B4; border-radius: 12px; padding: 12px 14px">
+<span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #E61B1B; flex: none; margin-top: 5px"></span>
+<div style="display: flex; flex-direction: column; gap: 1px">
+<span style="font-weight: 600; color: #B91414">Allergy: Penicillin</span>
+<span style="font-size: 13px; color: #3A4B5A">Rash reported. Avoid amoxicillin; prescribe an alternative.</span>
+</div>
+</div>
+<div style="display: flex; gap: 12px; align-items: flex-start; background: #FDECEC; border: 1px solid #F3B4B4; border-radius: 12px; padding: 12px 14px">
+<span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #E61B1B; flex: none; margin-top: 5px"></span>
+<div style="display: flex; flex-direction: column; gap: 1px">
+<span style="font-weight: 600; color: #B91414">Type 2 diabetes</span>
+<span style="font-size: 13px; color: #3A4B5A">Controlled. Prefer morning appointments after a meal.</span>
+</div>
+</div>
+</div>
+<dl style="margin: 0; display: flex; flex-direction: column; gap: 0; font-size: 14px">
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Medications</dt><dd style="margin: 0; text-align: right">Metformin 500 mg, twice daily</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Blood pressure</dt><dd style="margin: 0; text-align: right">Normal</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Bleeding disorders</dt><dd style="margin: 0; text-align: right">None</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Pregnancy</dt><dd style="margin: 0; text-align: right">No</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Smoking</dt><dd style="margin: 0; text-align: right">No</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0"><dt style="color: #5A6B7B">Anaesthesia reactions</dt><dd style="margin: 0; text-align: right">None reported</dd></div>
+</dl>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #C3D0DB; background: #FFFFFF; color: #16242F; font-size: 14px; font-weight: 500">Update medical history</button>
+</section>
+
+<section aria-labelledby="appt-h" style="background: #2F4A61; color: #FFFFFF; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="appt-h" style="margin: 0; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500; color: #D5E0EA">Next appointment</h2>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'Outfit', system-ui, sans-serif; font-size: 24px; font-weight: 600; line-height: 1.2">Tuesday 13 October</span>
+<span style="font-size: 15px; color: #E6EDF3">5:30 PM, 45 minutes</span>
+</div>
+<span style="font-size: 14px; color: #E6EDF3">Zirconia crown try-in, tooth 26, with Dr. Amin Okasha</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #FFFFFF; background: #FFFFFF; color: #16242F; font-size: 14px; font-weight: 600">Send WhatsApp reminder</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #9DB4C8; background: transparent; color: #FFFFFF; font-size: 14px; font-weight: 500">Reschedule</button>
+</div>
+</section>
+
+<section id="lab" aria-labelledby="lab-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="lab-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 18px">Lab orders</h2>
+<span style="font-size: 12px; color: #5A6B7B">In-house lab</span>
+</div>
+<div style="border: 1px solid #DCE4EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: flex-start">
+<div style="display: flex; flex-direction: column; gap: 1px">
+<span style="font-weight: 600">Zirconia crown, tooth 26</span>
+<span style="font-size: 13px; color: #3A4B5A">Shade A2 · due 12 Oct 2026</span>
+</div>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; color: #5A6B7B">LAB-0312</span>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #446681; flex: none"></span><span style="flex: 1 1 auto">Scan received</span><span style="color: #5A6B7B">28 Sep</span></li>
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #446681; flex: none"></span><span style="flex: 1 1 auto">CAD design</span><span style="color: #5A6B7B">02 Oct</span></li>
+<li style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #E08A1E; box-shadow: 0 0 0 3px #FCF1E0; flex: none"></span><span style="flex: 1 1 auto; font-weight: 600">Milling</span><span style="color: #8A4F00; font-weight: 600">Now</span></li>
+<li style="display: flex; align-items: center; gap: 10px; color: #5A6B7B"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid #C3D0DB; box-sizing: border-box; flex: none"></span><span style="flex: 1 1 auto">Sintering and glaze</span></li>
+<li style="display: flex; align-items: center; gap: 10px; color: #5A6B7B"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid #C3D0DB; box-sizing: border-box; flex: none"></span><span style="flex: 1 1 auto">Ready for try-in</span></li>
+</ol>
+</div>
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 0 2px">
+<div style="display: flex; flex-direction: column; gap: 1px">
+<span style="font-weight: 500">Zirconia crown, tooth 11</span>
+<span style="font-size: 13px; color: #5A6B7B">LAB-0274 · delivered 18 Jul 2026</span>
+</div>
+<span style="display: inline-block; background: #E6EDF3; color: #2F4A61; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600">Delivered</span>
+</div>
+</section>
+
+<section aria-labelledby="details-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 22px 24px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="details-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 18px">Personal details</h2>
+<button type="button" style="height: 44px; padding: 0 12px; border-radius: 10px; border: 0; background: transparent; color: #2F4A61; font-size: 14px; font-weight: 600">Edit</button>
+</div>
+<dl style="margin: 0; display: flex; flex-direction: column; gap: 0; font-size: 14px">
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Date of birth</dt><dd style="margin: 0; text-align: right">17 Feb 1992</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Phone</dt><dd style="margin: 0; text-align: right">+20 100 555 0142</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">WhatsApp</dt><dd style="margin: 0; text-align: right">Same number</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Address</dt><dd style="margin: 0; text-align: right">Nasr City, Cairo</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Occupation</dt><dd style="margin: 0; text-align: right">Teacher</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Referred by</dt><dd style="margin: 0; text-align: right">Instagram</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid #E6EDF3"><dt style="color: #5A6B7B">Emergency contact</dt><dd style="margin: 0; text-align: right">Hassan, husband<br>+20 100 555 0178</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0"><dt style="color: #5A6B7B">Insurance</dt><dd style="margin: 0; text-align: right">Self-pay</dd></div>
+</dl>
+</section>
+
+<section id="files" aria-labelledby="files-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 22px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="files-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 18px">Files and X-rays</h2>
+<button type="button" style="height: 44px; padding: 0 12px; border-radius: 10px; border: 0; background: transparent; color: #2F4A61; font-size: 14px; font-weight: 600">Upload</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<a href="#files" style="text-decoration: none; color: #16242F; display: flex; flex-direction: column; gap: 6px">
+<span style="height: 84px; border-radius: 10px; background: #16242F; color: #D5E0EA; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em">PANORAMIC X-RAY</span>
+<span style="font-size: 13px; font-weight: 500">Panoramic</span>
+<span style="font-size: 12px; color: #5A6B7B; margin-top: -4px">14 Jun 2026</span>
+</a>
+<a href="#files" style="text-decoration: none; color: #16242F; display: flex; flex-direction: column; gap: 6px">
+<span style="height: 84px; border-radius: 10px; background: #16242F; color: #D5E0EA; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em">PERIAPICAL 26</span>
+<span style="font-size: 13px; font-weight: 500">Periapical, tooth 26</span>
+<span style="font-size: 12px; color: #5A6B7B; margin-top: -4px">28 Sep 2026</span>
+</a>
+<a href="#files" style="text-decoration: none; color: #16242F; display: flex; flex-direction: column; gap: 6px">
+<span style="height: 84px; border-radius: 10px; background: #E6EDF3; color: #2F4A61; border: 1px solid #C3D0DB; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em">STL SCAN</span>
+<span style="font-size: 13px; font-weight: 500">Intraoral scan, upper</span>
+<span style="font-size: 12px; color: #5A6B7B; margin-top: -4px">28 Sep 2026</span>
+</a>
+<a href="#files" style="text-decoration: none; color: #16242F; display: flex; flex-direction: column; gap: 6px">
+<span style="height: 84px; border-radius: 10px; background: #F7F9FB; color: #3A4B5A; border: 1px solid #C3D0DB; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.1em">PDF</span>
+<span style="font-size: 13px; font-weight: 500">Signed consent form</span>
+<span style="font-size: 12px; color: #5A6B7B; margin-top: -4px">14 Jun 2026</span>
+</a>
+</div>
+</section>
+
+<section id="notes" aria-labelledby="notes-h" style="background: #FFFFFF; border: 1px solid #DCE4EB; border-radius: 16px; box-shadow: 0 1px 2px rgba(22,36,47,0.05); padding: 22px 24px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="notes-h" style="margin: 0; font-family: 'Outfit', system-ui, sans-serif; font-weight: 600; font-size: 18px">Notes</h2>
+<div style="background: #F7F9FB; border: 1px solid #DCE4EB; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 14px">Anxious with injections. Explain each step and use topical anaesthetic first.</span>
+<span style="font-size: 12px; color: #5A6B7B">Dr. Amin Okasha · 14 Jun 2026</span>
+</div>
+<label for="pc-note" style="font-size: 13px; font-weight: 500; color: #3A4B5A">Add a note</label>
+<textarea id="pc-note" rows="3" placeholder="Visible to clinic staff only" style="font: inherit; color: #16242F; border: 1px solid #C3D0DB; border-radius: 10px; padding: 10px 12px; resize: vertical; box-sizing: border-box; width: 100%"></textarea>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #C3D0DB; background: #FFFFFF; color: #16242F; font-size: 14px; font-weight: 500; align-self: flex-start">Save note</button>
+</section>
+
+</aside>
+</div>
+</main>
+</div>
+<script>
+var TEETH={"11":{"name":"Tooth 11 · Upper right central incisor","status":"Crown · Root canal treated","note":"Root canal 21 Jun 2026. Zirconia crown cemented 19 Jul 2026, shade A2."},"12":{"name":"Tooth 12 · Upper right lateral incisor","status":"Sound","note":"No recorded treatment."},"13":{"name":"Tooth 13 · Upper right canine","status":"Sound","note":"No recorded treatment."},"14":{"name":"Tooth 14 · Upper right first premolar","status":"Sound","note":"No recorded treatment."},"15":{"name":"Tooth 15 · Upper right second premolar","status":"Caries · Filling planned","note":"Distal caries on panoramic X-ray. Composite filling planned."},"16":{"name":"Tooth 16 · Upper right first molar","status":"Filling","note":"Composite, occlusal. Sound margins on 14 Jun 2026."},"17":{"name":"Tooth 17 · Upper right second molar","status":"Sound","note":"No recorded treatment."},"18":{"name":"Tooth 18 · Upper right third molar","status":"Missing","note":"Extracted before first visit (patient reported)."},"21":{"name":"Tooth 21 · Upper left central incisor","status":"Filling","note":"Composite, mesial. No change since first visit."},"22":{"name":"Tooth 22 · Upper left lateral incisor","status":"Sound","note":"No recorded treatment."},"23":{"name":"Tooth 23 · Upper left canine","status":"Sound","note":"No recorded treatment."},"24":{"name":"Tooth 24 · Upper left first premolar","status":"Sound","note":"No recorded treatment."},"25":{"name":"Tooth 25 · Upper left second premolar","status":"Sound","note":"No recorded treatment."},"26":{"name":"Tooth 26 · Upper left first molar","status":"Root canal treated · Crown in progress","note":"Three canals obturated 28 Sep 2026. Temporary filling in place. Crown LAB-0312 is being milled."},"27":{"name":"Tooth 27 · Upper left second molar","status":"Caries · Filling planned","note":"Occlusal caries. Composite filling planned."},"28":{"name":"Tooth 28 · Upper left third molar","status":"Missing","note":"Extracted before first visit (patient reported)."},"31":{"name":"Tooth 31 · Lower left central incisor","status":"Sound","note":"No recorded treatment."},"32":{"name":"Tooth 32 · Lower left lateral incisor","status":"Sound","note":"No recorded treatment."},"33":{"name":"Tooth 33 · Lower left canine","status":"Sound","note":"No recorded treatment."},"34":{"name":"Tooth 34 · Lower left first premolar","status":"Sound","note":"No recorded treatment."},"35":{"name":"Tooth 35 · Lower left second premolar","status":"Sound","note":"No recorded treatment."},"36":{"name":"Tooth 36 · Lower left first molar","status":"Implant with crown","note":"Placed at another clinic (patient reported). Stable on 14 Jun 2026."},"37":{"name":"Tooth 37 · Lower left second molar","status":"Filling","note":"Composite, occlusal and buccal."},"38":{"name":"Tooth 38 · Lower left third molar","status":"Sound","note":"No recorded treatment."},"41":{"name":"Tooth 41 · Lower right central incisor","status":"Sound","note":"No recorded treatment."},"42":{"name":"Tooth 42 · Lower right lateral incisor","status":"Sound","note":"No recorded treatment."},"43":{"name":"Tooth 43 · Lower right canine","status":"Sound","note":"No recorded treatment."},"44":{"name":"Tooth 44 · Lower right first premolar","status":"Sound","note":"No recorded treatment."},"45":{"name":"Tooth 45 · Lower right second premolar","status":"Sound","note":"No recorded treatment."},"46":{"name":"Tooth 46 · Lower right first molar","status":"Missing · Implant planned","note":"Implant with zirconia crown is in the treatment plan."},"47":{"name":"Tooth 47 · Lower right second molar","status":"Filling","note":"Composite, occlusal."},"48":{"name":"Tooth 48 · Lower right third molar","status":"Sound","note":"No recorded treatment."}};
+document.querySelectorAll("[data-tooth]").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("[data-tooth]").forEach(function(o){o.style.borderColor="transparent";o.style.background="transparent";o.setAttribute("aria-pressed","false")});b.style.borderColor="#446681";b.style.background="#E6EDF3";b.setAttribute("aria-pressed","true");var n=b.getAttribute("data-tooth"),t=TEETH[n];document.querySelector("[data-sel=n]").textContent=n;["name","status","note"].forEach(function(k){document.querySelector("[data-sel="+k+"]").textContent=t[k]})})});
+</script>
+</body>
+</html>

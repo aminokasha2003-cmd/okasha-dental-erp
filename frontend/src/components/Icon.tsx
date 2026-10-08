@@ -15,6 +15,10 @@ const PATHS = {
   chart: "M4 20V10M10 20V4M16 20v-7M22 20H2",
   check: "M5 12l5 5 9-10",
   circle: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4",
+  plus: "M12 5v14M5 12h14",
+  phone: "M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z",
+  file: "M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5",
 } as const;
 
 export type IconName = keyof typeof PATHS;

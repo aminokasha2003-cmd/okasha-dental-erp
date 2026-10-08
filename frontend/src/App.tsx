@@ -7,6 +7,9 @@ import { Audit } from "./pages/Audit";
 import { ComingSoon, NoAccess } from "./pages/ComingSoon";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
+import { Appointments } from "./pages/Appointments";
+import { PatientProfile } from "./pages/PatientProfile";
+import { Patients } from "./pages/Patients";
 import { Procedures } from "./pages/Procedures";
 import { Settings } from "./pages/Settings";
 import { Staff } from "./pages/Staff";
@@ -31,8 +34,9 @@ export function App() {
         <Route path="staff" element={<Guard module="masterdata"><Staff /></Guard>} />
         <Route path="procedures" element={<Guard module="masterdata"><Procedures /></Guard>} />
         <Route path="audit" element={<Guard module="audit"><Audit /></Guard>} />
-        <Route path="patients" element={<ComingSoon title="nav.patients" phase={1} />} />
-        <Route path="appointments" element={<ComingSoon title="nav.appointments" phase={1} />} />
+        <Route path="patients" element={<Guard module="patients"><Patients /></Guard>} />
+        <Route path="patients/:id" element={<Guard module="patients"><PatientProfile /></Guard>} />
+        <Route path="appointments" element={<Guard module="appointments"><Appointments /></Guard>} />
         <Route path="clinical" element={<ComingSoon title="nav.clinical" phase={2} />} />
         <Route path="billing" element={<ComingSoon title="nav.billing" phase={3} />} />
         <Route path="lab" element={<ComingSoon title="nav.lab" phase={4} />} />

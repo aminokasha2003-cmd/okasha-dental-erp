@@ -1,6 +1,7 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useI18n, type TKey } from "../i18n";
+import { AnimatedLogo } from "./AnimatedLogo";
 import { Icon, type IconName } from "./Icon";
 
 interface NavItem {
@@ -37,6 +38,7 @@ const LATER: NavItem[] = [
 export function Layout() {
   const { t, lang, name } = useI18n();
   const { me, can, logout, changeLanguage } = useAuth();
+  const navigate = useNavigate();
   const visible = (items: NavItem[]) => items.filter((i) => !i.module || can(i.module));
   const displayName = me ? [me.first_name, me.last_name].filter(Boolean).join(" ") || me.username : "";
   const roleNames = me?.roles.map((r) => name(r)).join(" · ");
@@ -53,10 +55,11 @@ export function Layout() {
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-mark">
-            <Icon name="tooth" />
+            <AnimatedLogo tone="dark" />
           </div>
           <div className="brand-text">
             <strong>{me?.clinic ? name(me.clinic) : t("appName")}</strong>
+            <span className="brand-sub">Clinic ERP</span>
           </div>
         </div>
         <nav aria-label="Main">
@@ -75,6 +78,20 @@ export function Layout() {
       </aside>
       <div className="main">
         <header className="topbar">
+          {can("patients") ? (
+            <form
+              className="top-search"
+              role="search"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const value = new FormData(e.currentTarget).get("q")?.toString() ?? "";
+                navigate(`/patients?search=${encodeURIComponent(value)}`);
+              }}
+            >
+              <Icon name="search" />
+              <input name="q" type="search" aria-label={t("search")} placeholder={t("pt.searchHint")} />
+            </form>
+          ) : null}
           <div className="topbar-spacer" />
           <div className="segmented" role="group" aria-label={t("language")}>
             <button aria-pressed={lang === "en"} onClick={() => changeLanguage("en")} lang="en">

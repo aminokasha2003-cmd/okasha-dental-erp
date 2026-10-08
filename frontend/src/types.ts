@@ -26,6 +26,7 @@ export interface Me {
   clinic: Clinic | null;
   roles: { id: number; code: string; name_en: string; name_ar: string }[];
   permissions: Record<string, string[]>;
+  staff_member: { id: number; staff_type: string } | null;
 }
 
 export interface Role {
@@ -54,3 +55,118 @@ export interface AuditEntry {
   object_repr: string;
   changes: Record<string, [unknown, unknown]>;
 }
+
+export interface Named {
+  id: number;
+  name_en: string;
+  name_ar: string;
+}
+
+export interface Branch extends Named {
+  is_active: boolean;
+}
+
+export interface Chair extends Named {
+  branch: number;
+  is_active: boolean;
+  sort_order: number;
+}
+
+export interface WorkingHours {
+  id: number;
+  branch: number;
+  weekday: number;
+  is_closed: boolean;
+  opens_at: string | null;
+  closes_at: string | null;
+}
+
+export interface StaffMember extends Named {
+  staff_type: string;
+  color: string;
+  branches: number[];
+  is_active: boolean;
+}
+
+export interface Procedure extends Named {
+  code: string;
+  default_duration_minutes: number;
+  is_active: boolean;
+}
+
+export interface Alert {
+  id: number;
+  kind: string;
+  text: string;
+  guidance: string;
+}
+
+export interface Patient {
+  id: number;
+  file_number: string;
+  name_ar: string;
+  name_en: string;
+  gender: string;
+  date_of_birth: string | null;
+  age: number | null;
+  phone: string;
+  phone_alt: string;
+  whatsapp_opt_in: boolean;
+  language: "ar" | "en";
+  email: string;
+  national_id: string;
+  address: string;
+  occupation: string;
+  referral_source: string;
+  home_branch: number | null;
+  preferred_dentist: number | null;
+  notes: string;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  insurance: string;
+  is_active: boolean;
+  alerts: Alert[];
+  created_at: string;
+}
+
+export type AppointmentStatus = "booked" | "confirmed" | "arrived" | "in_chair" | "completed" | "cancelled" | "no_show";
+
+export interface Appointment {
+  id: number;
+  patient: number;
+  patient_name: { ar: string; en: string };
+  patient_file_number: string;
+  patient_phone: string;
+  patient_alerts: string[];
+  dentist: number;
+  dentist_name_ar: string;
+  dentist_name_en: string;
+  dentist_color: string;
+  branch: number;
+  chair: number | null;
+  procedure: number | null;
+  procedure_name_ar: string;
+  procedure_name_en: string;
+  start: string;
+  duration_minutes: number;
+  end: string;
+  status: AppointmentStatus;
+  reason: string;
+  notes: string;
+  cancel_reason: string;
+  arrived_at: string | null;
+  seated_at: string | null;
+  completed_at: string | null;
+  reminder_sent_at: string | null;
+}
+
+/** Next steps offered for each status (mirrors Appointment.TRANSITIONS on the server). */
+export const NEXT_STATUS: Record<AppointmentStatus, AppointmentStatus[]> = {
+  booked: ["confirmed", "arrived", "cancelled", "no_show"],
+  confirmed: ["arrived", "cancelled", "no_show", "booked"],
+  arrived: ["in_chair", "booked", "cancelled"],
+  in_chair: ["completed", "arrived"],
+  completed: ["in_chair"],
+  cancelled: ["booked"],
+  no_show: ["booked"],
+};

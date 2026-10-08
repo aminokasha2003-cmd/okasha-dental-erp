@@ -2,7 +2,7 @@
 
 The clinic and lab management system for Okasha Dental Clinic, built so it can serve more clinics later. Each record carries a clinic ID.
 
-This is **phase 0, the foundation**: login, roles and permissions, clinic settings, master data, audit log, file storage, notifications and the app shell in Arabic and English. Phases 1 to 4 (patients and appointments, clinical records, billing, lab) plug into it.
+Built so far: **phase 0, the foundation** (login, roles and permissions, clinic settings, master data, audit log, file storage, notifications and the app shell in Arabic and English) and **phase 1, patients and appointments**. Phases 2 to 4 (clinical records, billing, lab) plug into the same foundation.
 
 ## Stack
 
@@ -44,6 +44,19 @@ The clinic itself lives in `core` rather than `masterdata`, because it is the te
 - **Clinic isolation.** Every query is limited to the signed-in user's clinic, and a record can never point at another clinic's data.
 - **Backups.** `python manage.py backup_db` writes a compressed `pg_dump` and deletes ones older than `BACKUP_KEEP_DAYS`. The Docker setup runs it daily.
 
+## Design
+
+The look follows the approved Okasha design in `docs/design/` (colours, fonts, logo, background pattern, and the patient card layout). The dental chart, treatment plan, billing and lab sections of that design are built with phases 2 to 4.
+
+## What phase 1 gives you
+
+- **Patient file.** Automatic file numbers (P-00001, ...), names in Arabic and English, mobile, WhatsApp consent, the language messages go out in, national ID, how they heard of the clinic, preferred dentist and branch. Search finds patients by name, phone or file number, and matches Arabic spelling variants (أ/ا, ة/ه, ى/ي), Arabic digits and phones with or without +20. Closing a file hides it but never erases it.
+- **Medical alerts and history.** Short alerts (for example a penicillin allergy) show in red on the patient file, the calendar and the booking form for every role. The full medical questionnaire is only visible to roles with clinical access.
+- **Setup check.** Until the clinic has a branch, chairs, working hours and a dentist, the calendar lists what is missing, with a one-click starting setup.
+- **Calendar by chair.** A day view per branch with one column per chair, a dentist filter (a dentist sees their own visits first), and click-a-slot booking. The server refuses a booking that overlaps on the same chair or with the same dentist, and asks for confirmation outside the branch's working hours.
+- **Visit flow and waiting room.** Booked, confirmed, arrived, in chair, completed, plus cancelled (with a reason) and no-show. Each step records its time, and the waiting room panel lists who is waiting and who is in the chair.
+- **Reminders.** `python manage.py send_reminders` (run daily; the Docker setup does) sends tomorrow's reminders over WhatsApp in each patient's language, once per visit, skipping patients who opted out. Reception can also send them from the calendar.
+
 ## Run it for development
 
 You need Python 3.12+, Node 20+ and PostgreSQL 16.
@@ -75,7 +88,7 @@ cd backend && DJANGO_DEBUG=1 python manage.py test erp
 cd frontend && npm run typecheck && npm run build
 ```
 
-The backend tests walk through the phase 0 finish line: the owner signs in, creates users with roles, sets up the clinic, branch, chairs, hours and procedures in both languages, and finds every change in the audit log. They also check clinic isolation, role limits, file rules and notifications.
+The backend tests walk through the finish line of each phase. For phase 1: reception registers a patient with an alert, books them, clashes and closed hours are refused, the visit goes through the waiting room, and reminders go out in the right language. For phase 0: the owner signs in, creates users with roles, sets up the clinic, branch, chairs, hours and procedures in both languages, and finds every change in the audit log. They also check clinic isolation, role limits, file rules and notifications.
 
 ## Run it in production
 
@@ -91,7 +104,9 @@ This starts PostgreSQL, the API, the web app on port 8080 and a daily backup job
 
 1. On the repository page on GitHub, click **Code > Codespaces > Create codespace on main**.
 2. Wait for setup to finish (a few minutes the first time). The terminal then shows the owner's username and password.
-3. The app runs in the terminal that opens with the codespace; keep it open. Open the **Ports** tab and click the globe icon next to port 8000. If the page says it is not working (502), run `bash .devcontainer/start.sh` in a terminal.
+3. The app runs in the terminal that opens with the codespace; keep it open. Open the **Ports** tab and click the globe icon next to port 8000. If the page says it is not working (502), the app is not running: run `bash .devcontainer/start.sh` in a terminal and keep it open.
+
+To get new code into a codespace you already have, run `git pull` (or `git checkout <branch>` to try a branch) and then `bash .devcontainer/update.sh` in a terminal. It rebuilds everything and restarts the app in that terminal; keep it open.
 
 Personal GitHub accounts include free Codespaces hours each month. The codespace stops after a period of inactivity; reopen it from the same menu and the data is still there. The app's address only works for your GitHub account unless you change the port's visibility.
 
@@ -112,6 +127,7 @@ The same `Dockerfile` runs on any host that builds containers (Railway, Fly.io, 
 ## Not done yet
 
 - API error messages are in English only. Screen text is in both languages.
+- The calendar shows one day at a time. A week view, online booking and recurring visits are not built.
 - WhatsApp and SMS need a provider (for example the WhatsApp Business API through a local partner) before messages really go out.
 - Files are stored on the server's disk. Moving them to cloud storage is a settings change once a provider is chosen.
 - An in-clinic copy that keeps working through internet cuts is not built.

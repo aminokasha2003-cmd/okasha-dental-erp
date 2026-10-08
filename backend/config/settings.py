@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "erp.core",
     "erp.masterdata",
+    "erp.patients",
+    "erp.appointments",
 ]
 
 MIDDLEWARE = [

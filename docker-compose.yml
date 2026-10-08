@@ -25,6 +25,13 @@ services:
     volumes: [appdata:/data]
     entrypoint: ["sh", "-c", "while true; do python manage.py backup_db; sleep 86400; done"]
     restart: unless-stopped
+  reminders:
+    # Sends WhatsApp reminders for the next day's appointments once a day.
+    build: ./backend
+    env_file: .env
+    depends_on: [db]
+    entrypoint: ["sh", "-c", "while true; do python manage.py send_reminders; sleep 86400; done"]
+    restart: unless-stopped
 volumes:
   pgdata:
   appdata:
