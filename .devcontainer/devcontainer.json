@@ -4,12 +4,19 @@
   "service": "app",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": { "version": "22" }
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
   },
-  "forwardPorts": [8000],
+  "forwardPorts": [
+    8000
+  ],
   "portsAttributes": {
-    "8000": { "label": "Okasha Dental ERP", "onAutoForward": "openBrowser" }
+    "8000": {
+      "label": "Okasha Dental ERP",
+      "onAutoForward": "openBrowser"
+    }
   },
   "postCreateCommand": "bash .devcontainer/setup.sh",
-  "postStartCommand": "bash .devcontainer/start.sh"
+  "postAttachCommand": "bash .devcontainer/start.sh"
 }
