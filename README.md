@@ -87,6 +87,14 @@ docker compose exec backend python manage.py setup_clinic --name-en ... --name-a
 
 This starts PostgreSQL, the API, the web app on port 8080 and a daily backup job. Put HTTPS in front of port 8080, and copy the backups volume off the server (cloud storage or a second machine). A backup on the same disk does not protect against losing that disk.
 
+## Try it free in GitHub Codespaces (no card needed)
+
+1. On the repository page on GitHub, click **Code > Codespaces > Create codespace on main**.
+2. Wait for setup to finish (a few minutes the first time). The terminal then shows the owner's username and password.
+3. Open the **Ports** tab and click the globe icon next to port 8000 to open the app.
+
+Personal GitHub accounts include free Codespaces hours each month. The codespace stops after a period of inactivity; reopen it from the same menu and the data is still there. The app's address only works for your GitHub account unless you change the port's visibility.
+
 ## Deploy a test server on Render
 
 `render.yaml` sets up one web service (API and web app in one container, from the root `Dockerfile`) and a PostgreSQL database.
