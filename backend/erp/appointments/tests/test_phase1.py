@@ -238,3 +238,30 @@ class AppointmentTests(Phase1Base):
         )
         call_command("send_reminders")
         self.assertIsNotNone(Appointment.objects.get().reminder_sent_at)
+
+
+class PatientFileTests(Phase1Base):
+    def test_staff_notes_keep_author_and_alert_guidance(self):
+        self.login("reception")
+        patient = self.add_patient()
+        note = self.client.post("/api/patients/notes/", {"patient": patient["id"], "text": "Anxious with injections"}, format="json")
+        self.assertEqual(note.status_code, 201, note.content)
+        self.assertEqual(note.data["author"], "reception")
+        self.assertEqual(self.client.patch(f"/api/patients/notes/{note.data['id']}/", {"text": "x"}, format="json").status_code, 405)
+        self.client.post(
+            "/api/patients/alerts/",
+            {"patient": patient["id"], "kind": "allergy", "text": "Penicillin", "guidance": "Avoid amoxicillin"},
+            format="json",
+        )
+        alerts = self.client.get(f"/api/patients/{patient['id']}/").data["alerts"]
+        self.assertEqual(alerts[0]["guidance"], "Avoid amoxicillin")
+
+    def test_remind_one_visit_now(self):
+        self.login("reception")
+        patient = self.add_patient()
+        appointment = self.book(patient["id"], at(self.tomorrow + timedelta(days=3), 12))
+        response = self.client.post(f"/api/appointments/{appointment['id']}/remind/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIsNotNone(response.data["reminder_sent_at"])
+        self.login("assist")
+        self.assertEqual(self.client.post(f"/api/appointments/{appointment['id']}/remind/").status_code, 403)

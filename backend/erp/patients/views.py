@@ -4,8 +4,8 @@ from rest_framework.response import Response
 
 from erp.core.api import ClinicScopedViewSet
 
-from .models import MedicalAlert, MedicalHistory, Patient, normalize_text
-from .serializers import MedicalAlertSerializer, MedicalHistorySerializer, PatientSerializer
+from .models import MedicalAlert, MedicalHistory, Patient, PatientNote, normalize_text
+from .serializers import MedicalAlertSerializer, MedicalHistorySerializer, PatientNoteSerializer, PatientSerializer
 
 
 class PatientViewSet(ClinicScopedViewSet):
@@ -62,6 +62,19 @@ class MedicalAlertViewSet(ClinicScopedViewSet):
     queryset = MedicalAlert.objects.select_related("patient")
     serializer_class = MedicalAlertSerializer
     module = "patients"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.query_params.get("patient"):
+            qs = qs.filter(patient=self.request.query_params["patient"])
+        return qs
+
+
+class PatientNoteViewSet(ClinicScopedViewSet):
+    queryset = PatientNote.objects.select_related("created_by")
+    serializer_class = PatientNoteSerializer
+    module = "patients"
+    http_method_names = ["get", "post", "delete", "head", "options"]  # a note is kept as written
 
     def get_queryset(self):
         qs = super().get_queryset()

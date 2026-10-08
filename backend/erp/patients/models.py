@@ -55,6 +55,9 @@ class Patient(ClinicScopedModel):
         "masterdata.StaffMember", null=True, blank=True, on_delete=models.SET_NULL, related_name="+", verbose_name=_("dentist")
     )
     notes = models.TextField(_("front-desk notes"), blank=True)
+    emergency_contact_name = models.CharField(_("emergency contact"), max_length=150, blank=True)
+    emergency_contact_phone = models.CharField(_("emergency contact phone"), max_length=30, blank=True)
+    insurance = models.CharField(_("insurance"), max_length=150, blank=True)
     is_active = models.BooleanField(_("active"), default=True)
     # Lower-cased, Arabic-normalized copy of the searchable fields.
     search_text = models.TextField(editable=False, default="")
@@ -120,6 +123,7 @@ class MedicalHistory(ClinicScopedModel):
     allergies = models.TextField(_("allergies"), blank=True)
     medications = models.TextField(_("current medications"), blank=True)
     past_surgeries = models.TextField(_("past operations"), blank=True)
+    anaesthesia_reactions = models.TextField(_("reactions to anaesthesia"), blank=True)
     notes = models.TextField(_("other notes"), blank=True)
 
     class Meta:
@@ -143,6 +147,7 @@ class MedicalAlert(ClinicScopedModel):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="alerts")
     kind = models.CharField(_("type"), max_length=20, choices=KINDS, default="condition")
     text = models.CharField(_("alert"), max_length=200)
+    guidance = models.CharField(_("what to do"), max_length=255, blank=True)
     is_active = models.BooleanField(_("active"), default=True)
 
     class Meta:
@@ -152,3 +157,18 @@ class MedicalAlert(ClinicScopedModel):
 
     def __str__(self):
         return self.text
+
+
+class PatientNote(ClinicScopedModel):
+    """Staff-only notes on a patient, each with its author and date (created_by / created_at)."""
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="staff_notes")
+    text = models.TextField(_("note"))
+
+    class Meta:
+        verbose_name = _("patient note")
+        verbose_name_plural = _("patient notes")
+        ordering = ["-created_at", "-id"]
+
+    def __str__(self):
+        return self.text[:50]

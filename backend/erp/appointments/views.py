@@ -11,7 +11,9 @@ from erp.core.api import ClinicScopedViewSet
 from erp.masterdata.models import Branch
 
 from .models import Appointment
-from .reminders import due_reminders, send_reminders
+from erp.core.notifications import notify
+
+from .reminders import due_reminders, reminder_text, send_reminders
 from .serializers import AppointmentSerializer, clashes
 
 # Moving into these statuses stamps the matching time.
@@ -27,7 +29,7 @@ class AppointmentViewSet(ClinicScopedViewSet):
     queryset = Appointment.objects.select_related("patient", "dentist", "procedure").prefetch_related("patient__alerts")
     serializer_class = AppointmentSerializer
     module = "appointments"
-    required_actions = {"set_status": "edit", "queue": "view", "reminders": "view", "send_reminders": "edit"}
+    required_actions = {"set_status": "edit", "queue": "view", "reminders": "view", "send_reminders": "edit", "remind": "edit"}
     pagination_class = None  # the calendar loads a day or a week at a time
 
     def get_queryset(self):
@@ -111,6 +113,21 @@ class AppointmentViewSet(ClinicScopedViewSet):
             "waiting": [a for a in data if a["status"] == "arrived"],
             "in_chair": [a for a in data if a["status"] == "in_chair"],
         })
+
+    @action(detail=True, methods=["post"])
+    def remind(self, request, pk=None):
+        """Send this visit's WhatsApp reminder now."""
+        appointment = self.get_object()
+        if appointment.status not in ("booked", "confirmed"):
+            raise ValidationError("Only booked or confirmed visits get a reminder.")
+        if not appointment.patient.whatsapp_opt_in:
+            raise ValidationError("This patient does not accept WhatsApp messages.")
+        notification = notify(appointment.clinic, "whatsapp", reminder_text(appointment), phone=appointment.patient.phone)
+        if notification.status != "sent":
+            raise ValidationError(f"The reminder could not be sent: {notification.error}")
+        appointment.reminder_sent_at = timezone.now()
+        appointment.save(update_fields=["reminder_sent_at", "updated_at"])
+        return Response(self.get_serializer(appointment).data)
 
     @action(detail=False, methods=["get"])
     def reminders(self, request):

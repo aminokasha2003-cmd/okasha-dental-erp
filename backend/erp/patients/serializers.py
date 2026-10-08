@@ -4,13 +4,13 @@ from rest_framework import serializers
 
 from erp.core.api import ClinicScopedSerializer
 
-from .models import MedicalAlert, MedicalHistory, Patient
+from .models import MedicalAlert, MedicalHistory, Patient, PatientNote
 
 
 class MedicalAlertSerializer(ClinicScopedSerializer):
     class Meta:
         model = MedicalAlert
-        fields = ["id", "patient", "kind", "text", "is_active", "created_at"]
+        fields = ["id", "patient", "kind", "text", "guidance", "is_active", "created_at"]
         read_only_fields = ["id", "created_at"]
 
 
@@ -40,6 +40,9 @@ class PatientSerializer(ClinicScopedSerializer):
             "home_branch",
             "preferred_dentist",
             "notes",
+            "emergency_contact_name",
+            "emergency_contact_phone",
+            "insurance",
             "is_active",
             "alerts",
             "created_at",
@@ -48,7 +51,7 @@ class PatientSerializer(ClinicScopedSerializer):
 
     def get_alerts(self, obj):
         # Everyone who can open the patient sees the active alerts, reception included.
-        return [{"id": a.id, "kind": a.kind, "text": a.text} for a in obj.alerts.all() if a.is_active]
+        return [{"id": a.id, "kind": a.kind, "text": a.text, "guidance": a.guidance} for a in obj.alerts.all() if a.is_active]
 
     def get_age(self, obj):
         born = obj.date_of_birth
@@ -91,7 +94,23 @@ class MedicalHistorySerializer(ClinicScopedSerializer):
             "allergies",
             "medications",
             "past_surgeries",
+            "anaesthesia_reactions",
             "notes",
             "updated_at",
         ]
         read_only_fields = ["updated_at"]
+
+
+class PatientNoteSerializer(ClinicScopedSerializer):
+    author = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PatientNote
+        fields = ["id", "patient", "text", "author", "created_at"]
+        read_only_fields = ["id", "author", "created_at"]
+
+    def get_author(self, obj):
+        user = obj.created_by
+        if user is None:
+            return ""
+        return user.get_full_name() or user.username

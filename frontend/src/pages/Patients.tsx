@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { get, getAll, post, type Page } from "../api";
 import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
@@ -59,7 +59,9 @@ export function Patients() {
   const { can } = useAuth();
   const navigate = useNavigate();
   const { branchOptions, dentistOptions } = useChoices();
-  const [search, setSearch] = useState("");
+  const [params] = useSearchParams();
+  const [search, setSearch] = useState(params.get("search") ?? "");
+  useEffect(() => setSearch(params.get("search") ?? ""), [params]);
   const [showClosed, setShowClosed] = useState(false);
   const [page, setPage] = useState<Page<Patient> | null>(null);
   const [rows, setRows] = useState<Patient[]>([]);

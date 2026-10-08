@@ -44,10 +44,15 @@ The clinic itself lives in `core` rather than `masterdata`, because it is the te
 - **Clinic isolation.** Every query is limited to the signed-in user's clinic, and a record can never point at another clinic's data.
 - **Backups.** `python manage.py backup_db` writes a compressed `pg_dump` and deletes ones older than `BACKUP_KEEP_DAYS`. The Docker setup runs it daily.
 
+## Design
+
+The look follows the approved Okasha design in `docs/design/` (colours, fonts, logo, background pattern, and the patient card layout). The dental chart, treatment plan, billing and lab sections of that design are built with phases 2 to 4.
+
 ## What phase 1 gives you
 
 - **Patient file.** Automatic file numbers (P-00001, ...), names in Arabic and English, mobile, WhatsApp consent, the language messages go out in, national ID, how they heard of the clinic, preferred dentist and branch. Search finds patients by name, phone or file number, and matches Arabic spelling variants (أ/ا, ة/ه, ى/ي), Arabic digits and phones with or without +20. Closing a file hides it but never erases it.
 - **Medical alerts and history.** Short alerts (for example a penicillin allergy) show in red on the patient file, the calendar and the booking form for every role. The full medical questionnaire is only visible to roles with clinical access.
+- **Setup check.** Until the clinic has a branch, chairs, working hours and a dentist, the calendar lists what is missing, with a one-click starting setup.
 - **Calendar by chair.** A day view per branch with one column per chair, a dentist filter (a dentist sees their own visits first), and click-a-slot booking. The server refuses a booking that overlaps on the same chair or with the same dentist, and asks for confirmation outside the branch's working hours.
 - **Visit flow and waiting room.** Booked, confirmed, arrived, in chair, completed, plus cancelled (with a reason) and no-show. Each step records its time, and the waiting room panel lists who is waiting and who is in the chair.
 - **Reminders.** `python manage.py send_reminders` (run daily; the Docker setup does) sends tomorrow's reminders over WhatsApp in each patient's language, once per visit, skipping patients who opted out. Reception can also send them from the calendar.

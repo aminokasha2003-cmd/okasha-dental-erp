@@ -98,6 +98,7 @@ export interface Alert {
   id: number;
   kind: string;
   text: string;
+  guidance: string;
 }
 
 export interface Patient {
@@ -120,6 +121,9 @@ export interface Patient {
   home_branch: number | null;
   preferred_dentist: number | null;
   notes: string;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  insurance: string;
   is_active: boolean;
   alerts: Alert[];
   created_at: string;

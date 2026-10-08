@@ -50,6 +50,9 @@ export function patientFields(
     },
     { name: "home_branch", label: "pt.homeBranch", type: "select", options: branches },
     { name: "preferred_dentist", label: "pt.dentist", type: "select", options: dentists },
+    { name: "emergency_contact_name", label: "pt.emergency" },
+    { name: "emergency_contact_phone", label: "pt.emergencyPhone", dir: "ltr" },
+    { name: "insurance", label: "pt.insurance" },
     { name: "address", label: "pt.address", type: "textarea" },
     { name: "notes", label: "pt.notes", type: "textarea" },
   ];
