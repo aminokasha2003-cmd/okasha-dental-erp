@@ -498,6 +498,17 @@ const en = {
   "cl.dentist": "Dentist",
   "cl.remaining": "Remaining",
   "pt.newNote": "New visit note",
+  "group.work": "Daily work",
+  "nav.soon": "Soon",
+  "nav.collapse": "Collapse menu",
+  "nav.expand": "Expand menu",
+  "nav.menu": "Menu",
+  "nav.badge": "{n} waiting",
+  "greet.morning": "Good morning, {name}",
+  "greet.afternoon": "Good afternoon, {name}",
+  "greet.evening": "Good evening, {name}",
+  "theme.toDark": "Switch to dark mode",
+  "theme.toLight": "Switch to light mode",
 };
 
 type Key = keyof typeof en;
@@ -990,6 +1001,17 @@ const ar: Record<Key, string> = {
   "cl.dentist": "الطبيب",
   "cl.remaining": "المتبقي",
   "pt.newNote": "ملاحظة زيارة جديدة",
+  "group.work": "العمل اليومي",
+  "nav.soon": "قريبًا",
+  "nav.collapse": "تصغير القائمة",
+  "nav.expand": "توسيع القائمة",
+  "nav.menu": "القائمة",
+  "nav.badge": "{n} بالانتظار",
+  "greet.morning": "صباح الخير يا {name}",
+  "greet.afternoon": "مساء الخير يا {name}",
+  "greet.evening": "مساء الخير يا {name}",
+  "theme.toDark": "التبديل إلى الوضع الداكن",
+  "theme.toLight": "التبديل إلى الوضع الفاتح",
 };
 
 const dictionaries: Record<Lang, Record<Key, string>> = { en, ar };
