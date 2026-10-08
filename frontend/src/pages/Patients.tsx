@@ -25,13 +25,29 @@ export function useChoices() {
   const { can } = useAuth();
   const [branches, setBranches] = useState<Branch[]>([]);
   const [dentists, setDentists] = useState<StaffMember[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [version, setVersion] = useState(0);
   useEffect(() => {
-    if (!can("masterdata")) return;
-    getAll<Branch>("/api/masterdata/branches/?is_active=true").then(setBranches).catch(() => undefined);
-    getAll<StaffMember>("/api/masterdata/staff/?staff_type=dentist&is_active=true").then(setDentists).catch(() => undefined);
-  }, [can]);
+    if (!can("masterdata")) {
+      setLoaded(true);
+      return;
+    }
+    Promise.all([
+      getAll<Branch>("/api/masterdata/branches/?is_active=true").then(setBranches),
+      getAll<StaffMember>("/api/masterdata/staff/?staff_type=dentist&is_active=true").then(setDentists),
+    ])
+      .catch(() => undefined)
+      .finally(() => setLoaded(true));
+  }, [can, version]);
   const options = (rows: { id: number; name_en: string; name_ar: string }[]): Option[] => rows.map((r) => ({ value: r.id, label: name(r) }));
-  return { branches, dentists, branchOptions: options(branches), dentistOptions: options(dentists) };
+  return {
+    branches,
+    dentists,
+    loaded,
+    reload: () => setVersion((v) => v + 1),
+    branchOptions: options(branches),
+    dentistOptions: options(dentists),
+  };
 }
 
 export function patientName(p: { name_ar: string; name_en: string }, lang: string) {

@@ -280,6 +280,15 @@ const en = {
   "ap.closedDay": "The branch is closed on this day.",
   "ap.openPatient": "Patient file",
   "ap.count": "{n} appointments",
+  "setup.title": "Before you book",
+  "setup.intro": "The calendar needs a branch, its chairs, working hours and at least one dentist.",
+  "setup.branch": "Add a branch",
+  "setup.chairs": "Add the branch's chairs",
+  "setup.hours": "Set the branch's working hours",
+  "setup.dentists": "Add a dentist in the staff directory",
+  "setup.quick": "Fill in a starting setup",
+  "setup.quickHint": "The starting setup adds what is missing: a main branch, 2 chairs, hours Saturday to Thursday 10:00 to 22:00 with Friday closed, and you as a dentist. You can change all of it in clinic settings and the staff directory.",
+  "ap.noDentists": "There is no dentist to book with yet. Add one in the staff directory.",
 };
 
 type Key = keyof typeof en;
@@ -554,6 +563,15 @@ const ar: Record<Key, string> = {
   "ap.closedDay": "الفرع مغلق في هذا اليوم.",
   "ap.openPatient": "ملف المريض",
   "ap.count": "{n} موعد",
+  "setup.title": "قبل الحجز",
+  "setup.intro": "يحتاج التقويم إلى فرع وكراسيه ومواعيد العمل وطبيب واحد على الأقل.",
+  "setup.branch": "إضافة فرع",
+  "setup.chairs": "إضافة كراسي الفرع",
+  "setup.hours": "تحديد مواعيد عمل الفرع",
+  "setup.dentists": "إضافة طبيب في دليل الموظفين",
+  "setup.quick": "إعداد مبدئي سريع",
+  "setup.quickHint": "يضيف الإعداد المبدئي ما ينقص فقط: فرع رئيسي، وكرسيين، ومواعيد من السبت إلى الخميس من 10:00 إلى 22:00 والجمعة إجازة، وأنت كطبيب. يمكنك تعديل كل ذلك من إعدادات العيادة ودليل الموظفين.",
+  "ap.noDentists": "لا يوجد طبيب للحجز معه بعد. أضف طبيباً في دليل الموظفين.",
 };
 
 const dictionaries: Record<Lang, Record<Key, string>> = { en, ar };

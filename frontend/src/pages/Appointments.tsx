@@ -17,25 +17,122 @@ function apptName(a: Appointment, lang: string) {
   return (lang === "ar" ? a.patient_name.ar || a.patient_name.en : a.patient_name.en || a.patient_name.ar) || a.patient_file_number;
 }
 
-function useChairs(branch: number | null) {
+function useChairs(branch: number | null, version = 0) {
   const [chairs, setChairs] = useState<Chair[]>([]);
   useEffect(() => {
     if (!branch) return setChairs([]);
     getAll<Chair>(`/api/masterdata/chairs/?branch=${branch}&is_active=true`).then(setChairs).catch(() => setChairs([]));
-  }, [branch]);
+  }, [branch, version]);
   return chairs;
+}
+
+const STARTER_CHAIRS = 2;
+
+/** What still has to be set up before the calendar is useful, with a one-click starting setup. */
+function SetupChecklist({
+  branch,
+  chairs,
+  hours,
+  dentists,
+  onDone,
+}: {
+  branch: number | null;
+  chairs: number;
+  hours: number;
+  dentists: number;
+  onDone: () => void;
+}) {
+  const { t } = useI18n();
+  const { me, can, reload: reloadMe } = useAuth();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const items: { done: boolean; label: TKey; to: string; module: string }[] = [
+    { done: Boolean(branch), label: "setup.branch", to: "/settings", module: "settings" },
+    { done: chairs > 0, label: "setup.chairs", to: "/settings", module: "settings" },
+    { done: hours > 0, label: "setup.hours", to: "/settings", module: "settings" },
+    { done: dentists > 0, label: "setup.dentists", to: "/staff", module: "masterdata" },
+  ];
+  if (items.every((i) => i.done)) return null;
+  const canQuick = can("settings", "create") && can("masterdata", "create");
+
+  const quickSetup = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      let branchId = branch;
+      if (!branchId) branchId = (await post<{ id: number }>("/api/masterdata/branches/", { name_en: "Main branch", name_ar: "الفرع الرئيسي", is_active: true })).id;
+      if (chairs === 0) {
+        for (let i = 1; i <= STARTER_CHAIRS; i++)
+          await post("/api/masterdata/chairs/", { branch: branchId, name_en: `Chair ${i}`, name_ar: `كرسي ${i}`, sort_order: i, is_active: true });
+      }
+      if (hours === 0) {
+        // Saturday to Thursday 10:00 to 22:00, Friday closed (weekday 4). Editable in clinic settings.
+        for (let day = 0; day < 7; day++)
+          await post("/api/masterdata/working-hours/", day === 4 ? { branch: branchId, weekday: day, is_closed: true } : { branch: branchId, weekday: day, is_closed: false, opens_at: "10:00", closes_at: "22:00" });
+      }
+      if (dentists === 0 && me) {
+        const full = [me.first_name, me.last_name].filter(Boolean).join(" ") || me.username;
+        await post("/api/masterdata/staff/", {
+          name_en: `Dr. ${full}`,
+          name_ar: `د. ${full}`,
+          staff_type: "dentist",
+          user: me.staff_member ? null : me.id,
+          branches: [branchId],
+          commission_type: "none",
+          commission_value: "0",
+          is_active: true,
+        });
+      }
+      await reloadMe();
+      onDone();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="card setup-card">
+      <header className="card-head">
+        <div>
+          <h2>{t("setup.title")}</h2>
+          <p className="muted small">{t("setup.intro")}</p>
+        </div>
+        {canQuick && (
+          <button className="btn btn-primary" disabled={busy} onClick={() => void quickSetup()}>
+            {t("setup.quick")}
+          </button>
+        )}
+      </header>
+      <ul className="checklist">
+        {items.map((i) => (
+          <li key={i.label}>
+            <span className={`pill ${i.done ? "pill-ok" : "pill-warn"}`}>{i.done ? t("home.done") : t("home.todo")}</span>
+            <span className="grow">{t(i.label)}</span>
+            {!i.done && can(i.module) && (
+              <Link className="btn btn-small" to={i.to}>{t("home.open")}</Link>
+            )}
+          </li>
+        ))}
+      </ul>
+      {canQuick && <p className="muted small pad">{t("setup.quickHint")}</p>}
+      {error && <p className="form-error" role="alert">{error}</p>}
+    </section>
+  );
 }
 
 export function Appointments() {
   const { t, lang, name } = useI18n();
   const { me, can } = useAuth();
   const [params, setParams] = useSearchParams();
-  const { branches, dentists } = useChoices();
+  const { branches, dentists, loaded, reload: reloadChoices } = useChoices();
+  const [setupVersion, setSetupVersion] = useState(0);
   const day = params.get("date") || isoDay(new Date());
   const branch = Number(params.get("branch")) || branches[0]?.id || null;
   const ownDentist = me?.staff_member?.staff_type === "dentist" ? String(me.staff_member.id) : "";
   const dentistFilter = params.get("dentist") ?? ownDentist;
-  const chairs = useChairs(branch);
+  const chairs = useChairs(branch, setupVersion);
   const [hours, setHours] = useState<WorkingHours[]>([]);
   const [rows, setRows] = useState<Appointment[] | null>(null);
   const [queue, setQueue] = useState<{ waiting: Appointment[]; in_chair: Appointment[] }>({ waiting: [], in_chair: [] });
@@ -56,7 +153,7 @@ export function Appointments() {
   useEffect(() => {
     if (!branch) return;
     getAll<WorkingHours>(`/api/masterdata/working-hours/?branch=${branch}`).then(setHours).catch(() => setHours([]));
-  }, [branch]);
+  }, [branch, setupVersion]);
 
   const load = useCallback(async () => {
     if (!branch) return;
@@ -93,7 +190,8 @@ export function Appointments() {
   close = Math.min(24 * 60, Math.ceil(close / 60) * 60);
   const slots = Array.from({ length: (close - open) / SLOT }, (_, i) => open + i * SLOT);
   const columns: { id: number | null; label: string }[] = chairs.map((c) => ({ id: c.id, label: name(c) }));
-  if (onGrid.some((a) => a.chair === null)) columns.push({ id: null, label: t("ap.noChair") });
+  // Visits without a chair get their own column; with no chairs set up it is the only one, so booking still works.
+  if (chairs.length === 0 || onGrid.some((a) => a.chair === null)) columns.push({ id: null, label: t("ap.noChair") });
 
   const sendReminders = async () => {
     const result = await post<{ sent: number; failed: number }>("/api/appointments/send-reminders/", {});
@@ -103,25 +201,32 @@ export function Appointments() {
 
   const canBook = can("appointments", "create");
 
-  if (branches.length === 0 && rows === null) {
-    return (
-      <div className="page">
-        <h1>{t("nav.appointments")}</h1>
-        <p className="muted">{can("masterdata") ? t("loading") : t("noAccess")}</p>
-      </div>
-    );
-  }
+  if (!loaded) return <p className="muted pad">{t("loading")}</p>;
+  const checklist = (
+    <SetupChecklist
+      branch={branch}
+      chairs={chairs.length}
+      hours={hours.length}
+      dentists={dentists.length}
+      onDone={() => {
+        reloadChoices();
+        setSetupVersion((v) => v + 1);
+      }}
+    />
+  );
 
   return (
     <div className="page">
       <div className="page-head">
         <h1>{t("nav.appointments")}</h1>
-        {canBook && (
+        {canBook && branch && (
           <button className="btn btn-primary" onClick={() => setDialog({ day, branch: branch ?? undefined, dentist: dentistFilter ? Number(dentistFilter) : undefined })}>
             + {t("ap.new")}
           </button>
         )}
       </div>
+      {checklist}
+      {branch && (
       <section className="card">
         <div className="card-head calendar-bar">
           <div className="toolbar">
@@ -157,11 +262,8 @@ export function Appointments() {
         {notice && <p className="notice pad" role="status">{notice}</p>}
         {error && <p className="form-error" role="alert">{error}</p>}
         {todays?.is_closed && <p className="notice pad">{t("ap.closedDay")}</p>}
-        {!branch ? (
-          <p className="muted pad">{t("ap.noBranches")}</p>
-        ) : columns.length === 0 ? (
-          <p className="muted pad">{t("ap.noChairs")}</p>
-        ) : (
+        {(
+
           <div className="calendar-layout">
             <div className="calendar-scroll">
               <div className="calendar" style={{ gridTemplateColumns: `56px repeat(${columns.length}, minmax(150px, 1fr))` }}>
@@ -182,7 +284,7 @@ export function Appointments() {
                         className={`cal-slot ${m % 60 === 0 ? "hour" : ""}`}
                         style={{ height: SLOT_PX }}
                         aria-label={`${c.label} ${hhmm(m)}`}
-                        disabled={!canBook || c.id === null}
+                        disabled={!canBook}
                         onClick={() => setDialog({ day, time: hhmm(m), branch: branch ?? undefined, chair: c.id ?? undefined, dentist: dentistFilter ? Number(dentistFilter) : undefined })}
                       />
                     ))}
@@ -234,6 +336,7 @@ export function Appointments() {
           </div>
         )}
       </section>
+      )}
       {dialog && (
         <AppointmentDialog
           initial={dialog}
@@ -404,7 +507,7 @@ export function AppointmentDialog({
 }) {
   const { t, lang, name } = useI18n();
   const { me } = useAuth();
-  const { branches, dentists } = useChoices();
+  const { branches, dentists, loaded: dentistsLoaded } = useChoices();
   const existing = initial.appointment;
   const [patient, setPatient] = useState<{ id: number; label: string; alerts: string[] } | null>(
     existing
@@ -439,6 +542,14 @@ export function AppointmentDialog({
   useEffect(() => {
     if (!values.branch && branches[0]) setValues((v) => ({ ...v, branch: branches[0].id }));
   }, [branches, values.branch]);
+  // With a single dentist (or a single chair) there is nothing to choose, so pick it.
+  useEffect(() => {
+    const options = dentists.filter((d) => !d.branches.length || !branchId || d.branches.includes(branchId));
+    if (!values.dentist && options.length === 1) setValues((v) => ({ ...v, dentist: options[0].id }));
+  }, [dentists, branchId, values.dentist]);
+  useEffect(() => {
+    if (!values.chair && !existing && chairs.length === 1) setValues((v) => ({ ...v, chair: chairs[0].id }));
+  }, [chairs, values.chair, existing]);
 
   const set = (key: string, value: unknown) => {
     setValues((v) => {
@@ -495,11 +606,13 @@ export function AppointmentDialog({
 
   const opt = (rows: { id: number; name_en: string; name_ar: string }[]) => rows.map((r) => ({ value: r.id, label: name(r) }));
   const branchDentists = dentists.filter((d) => !d.branches.length || !branchId || d.branches.includes(branchId));
+  const missing = !branchId ? t("ap.noBranches") : branchDentists.length === 0 && dentistsLoaded ? t("ap.noDentists") : "";
 
   return (
     <Modal title={existing ? `${t("edit")}: ${apptName(existing, lang)}` : t("ap.new")} onClose={onClose}>
       {!existing && <PatientPicker value={patient} onChange={setPatient} error={errors.patient} />}
       {patient && patient.alerts.length > 0 && <AlertPills alerts={patient.alerts} />}
+      {missing && <p className="notice pad" role="alert">{missing}</p>}
       <form className="form-grid form-grid-2" onSubmit={(e) => void submit(e)}>
         {branches.length > 1 && (
           <Field field={{ name: "branch", label: "ap.branch", type: "select", required: true, options: opt(branches) }} value={values.branch} onChange={(v) => set("branch", v)} errors={errors.branch} />
@@ -525,7 +638,7 @@ export function AppointmentDialog({
           {outsideHours && (
             <button type="button" className="btn" disabled={busy} onClick={() => void submit(null, true)}>{t("ap.bookAnyway")}</button>
           )}
-          <button type="submit" className="btn btn-primary" disabled={busy}>{t("save")}</button>
+          <button type="submit" className="btn btn-primary" disabled={busy || Boolean(missing)}>{t("save")}</button>
         </div>
       </form>
     </Modal>
