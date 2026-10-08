@@ -341,3 +341,29 @@ th.center, td.center { text-align: center; }
   .sidebar, .topbar, .section-nav, .pf-actions, .next-actions, .inline-form, .patient-file form, .btn { display: none !important; }
   .main { background: #fff; }
 }
+
+/* Animated logo */
+.ok-logo { display: block; overflow: visible; }
+.ok-logo-base { opacity: 0.35; }
+.ok-logo-run { stroke-dasharray: 28 72; animation: ok-logo-cycle 3.2s linear infinite; }
+.ok-logo-run-b { animation-delay: -1.6s; }
+.ok-logo-dark .ok-logo-run { filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.55)); }
+.ok-logo-dot { transform-box: fill-box; transform-origin: center; animation: ok-logo-dot 3.2s ease-in-out infinite; }
+@keyframes ok-logo-cycle { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+@keyframes ok-logo-dot { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+/* Sign-in: draw the outline first, drop the dot in, then keep cycling. */
+.ok-logo-intro .ok-logo-base { stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 1; animation: ok-logo-draw 1.6s ease-out forwards, ok-logo-settle 0.6s ease 1.6s forwards; }
+.ok-logo-intro .ok-logo-base + .ok-logo-base { animation-delay: 0.25s, 1.85s; }
+.ok-logo-intro .ok-logo-run { opacity: 0; animation: ok-logo-cycle 3.2s linear 2s infinite, ok-logo-fade-in 0.6s ease 2s forwards; }
+.ok-logo-intro .ok-logo-run-b { animation-delay: 3.6s, 2s; }
+.ok-logo-intro .ok-logo-dot { transform: scale(0); animation: ok-logo-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) 1.5s forwards, ok-logo-dot 3.2s ease-in-out 2.4s infinite; }
+@keyframes ok-logo-draw { to { stroke-dashoffset: 0; } }
+@keyframes ok-logo-settle { to { opacity: 0.35; } }
+@keyframes ok-logo-fade-in { to { opacity: 1; } }
+@keyframes ok-logo-pop { from { transform: scale(0); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .ok-logo *, .ok-logo-intro * { animation: none !important; }
+  .ok-logo-base { opacity: 1 !important; stroke-dashoffset: 0 !important; }
+  .ok-logo-run { display: none; }
+  .ok-logo-dot { transform: none !important; }
+}

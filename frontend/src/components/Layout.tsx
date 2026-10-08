@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { useI18n, type TKey } from "../i18n";
+import { AnimatedLogo } from "./AnimatedLogo";
 import { Icon, type IconName } from "./Icon";
 
 interface NavItem {
@@ -54,7 +55,7 @@ export function Layout() {
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-mark">
-            <img src="/brand/logo-white.svg" alt="" />
+            <AnimatedLogo tone="dark" />
           </div>
           <div className="brand-text">
             <strong>{me?.clinic ? name(me.clinic) : t("appName")}</strong>

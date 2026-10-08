@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
+import { AnimatedLogo } from "../components/AnimatedLogo";
 
 export function Login() {
   const { t, lang, setLang } = useI18n();
@@ -27,7 +28,7 @@ export function Login() {
     <div className="login-page">
       <form className="card login-card" onSubmit={submit}>
         <div className="login-head">
-          <img className="login-logo" src="/brand/logo.svg" alt="" />
+          <AnimatedLogo mode="intro" size={72} />
           <h1>{t("appName")}</h1>
         </div>
         <div className="field">
