@@ -104,9 +104,9 @@ This starts PostgreSQL, the API, the web app on port 8080 and a daily backup job
 
 1. On the repository page on GitHub, click **Code > Codespaces > Create codespace on main**.
 2. Wait for setup to finish (a few minutes the first time). The terminal then shows the owner's username and password.
-3. The app runs in the terminal that opens with the codespace; keep it open. Open the **Ports** tab and click the globe icon next to port 8000. If the page says it is not working (502), run `bash .devcontainer/start.sh` in a terminal.
+3. The app runs in the terminal that opens with the codespace; keep it open. Open the **Ports** tab and click the globe icon next to port 8000. If the page says it is not working (502), the app is not running: run `bash .devcontainer/start.sh` in a terminal and keep it open.
 
-To get new code into a codespace you already have, run `git pull` (or `git checkout <branch>` to try a branch) and then `bash .devcontainer/update.sh` in a terminal.
+To get new code into a codespace you already have, run `git pull` (or `git checkout <branch>` to try a branch) and then `bash .devcontainer/update.sh` in a terminal. It rebuilds everything and restarts the app in that terminal; keep it open.
 
 Personal GitHub accounts include free Codespaces hours each month. The codespace stops after a period of inactivity; reopen it from the same menu and the data is still there. The app's address only works for your GitHub account unless you change the port's visibility.
 
