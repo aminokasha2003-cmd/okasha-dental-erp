@@ -37,11 +37,13 @@ class FilterByParamsMixin:
         return qs
 
 
-# Clinic settings: branches, rooms, chairs and working hours.
+# Clinic settings: branches, rooms, chairs and working hours. Changing them is a
+# settings permission; anyone with master data view can read them (the calendar needs them).
 class BranchViewSet(ProtectedDeleteMixin, FilterByParamsMixin, ClinicScopedViewSet):
     queryset = Branch.objects.all()
     serializer_class = BranchSerializer
     module = "settings"
+    view_module = "masterdata"
     filter_params = ("is_active",)
 
 
@@ -49,6 +51,7 @@ class RoomViewSet(ProtectedDeleteMixin, FilterByParamsMixin, ClinicScopedViewSet
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     module = "settings"
+    view_module = "masterdata"
     filter_params = ("branch", "is_active")
 
 
@@ -56,6 +59,7 @@ class ChairViewSet(ProtectedDeleteMixin, FilterByParamsMixin, ClinicScopedViewSe
     queryset = Chair.objects.all()
     serializer_class = ChairSerializer
     module = "settings"
+    view_module = "masterdata"
     filter_params = ("branch", "is_active")
 
 
@@ -63,6 +67,7 @@ class WorkingHoursViewSet(FilterByParamsMixin, ClinicScopedViewSet):
     queryset = WorkingHours.objects.all()
     serializer_class = WorkingHoursSerializer
     module = "settings"
+    view_module = "masterdata"
     filter_params = ("branch",)
 
 

@@ -39,6 +39,8 @@ class ModulePermission(permissions.BasePermission):
         required = getattr(view, "required_actions", {}).get(getattr(view, "action", None))
         if required is None:
             required = ACTION_MAP.get(getattr(view, "action", None)) or METHOD_MAP.get(request.method, "view")
+        if required == "view" and getattr(view, "view_module", None) and user.has_module_perm(view.view_module, "view"):
+            return True
         return user.has_module_perm(module, required)
 
 
