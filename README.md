@@ -57,6 +57,17 @@ The look follows the approved Okasha design in `docs/design/` (colours, fonts, l
 - **Visit flow and waiting room.** Booked, confirmed, arrived, in chair, completed, plus cancelled (with a reason) and no-show. Each step records its time, and the waiting room panel lists who is waiting and who is in the chair.
 - **Reminders.** `python manage.py send_reminders` (run daily; the Docker setup does) sends tomorrow's reminders over WhatsApp in each patient's language, once per visit, skipping patients who opted out. Reception can also send them from the calendar.
 
+## What phase 2 gives you
+
+- **Dental chart.** FDI chart of the permanent teeth, drawn as in the design handoff. Each tooth records missing, crown, implant and root canal, plus caries, filling or root canal access per surface (M, D, O, B, L). Teeth with planned work get an amber dot, and the record panel shows the tooth's status, note and what is planned.
+- **Treatment plans.** Lines come from the procedure catalog with tooth, surfaces, price (defaults to the catalog price) and discount. A plan moves from proposed to agreed, in progress and completed as its lines are done. Each line can be booked straight into the calendar and remembers its appointment. Totals show done, planned and plan total in EGP.
+- **Visit notes.** Complaint, findings, work done and next step, linked to the visit. Ticking procedures in a note marks those plan lines done. A dentist signs the note, and a signed note can no longer be changed or deleted.
+- **Prescriptions.** Medicines with dose, frequency and duration, with common dental drugs suggested, printed on the clinic letterhead.
+- **Consent forms.** Four starter forms in Arabic and English (general treatment, extraction, root canal, implant) that the owner can edit on the Clinical records page. The patient or a guardian signs on screen with a finger or stylus, and the signed copy keeps its own text and can be printed.
+- **X-rays and images.** X-rays, photos and scans upload into a gallery on the patient file, with a viewer that zooms and adjusts brightness, contrast and invert.
+- **Clinical records page.** Visit notes waiting for signature and treatment plans in progress across the clinic.
+- Reception never sees the chart, plans, notes, prescriptions or consents. Assistants can read them but not change or sign them.
+
 ## Run it for development
 
 You need Python 3.12+, Node 20+ and PostgreSQL 16.

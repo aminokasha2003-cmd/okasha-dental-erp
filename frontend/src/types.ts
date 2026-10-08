@@ -91,6 +91,8 @@ export interface StaffMember extends Named {
 export interface Procedure extends Named {
   code: string;
   default_duration_minutes: number;
+  default_price: string;
+  needs_lab: boolean;
   is_active: boolean;
 }
 
@@ -170,3 +172,106 @@ export const NEXT_STATUS: Record<AppointmentStatus, AppointmentStatus[]> = {
   cancelled: ["booked"],
   no_show: ["booked"],
 };
+
+// Phase 2: clinical records
+export type Surface = "M" | "D" | "O" | "B" | "L";
+export type SurfaceState = "sound" | "caries" | "filling" | "rct";
+
+export interface ToothRecord {
+  id?: number;
+  patient: number;
+  tooth: number;
+  missing: boolean;
+  crown: boolean;
+  implant: boolean;
+  root_canal_treated: boolean;
+  surfaces: Partial<Record<Surface, SurfaceState>>;
+  note: string;
+  updated_at?: string;
+}
+
+export type PlanStatus = "proposed" | "accepted" | "in_progress" | "completed" | "cancelled";
+export type LineStatus = "planned" | "in_progress" | "done" | "cancelled";
+export interface PatientInfo { id: number; ar: string; en: string; file_number: string }
+
+export interface PlanLine {
+  id: number;
+  plan: number;
+  procedure: number;
+  procedure_code: string;
+  procedure_name_en: string;
+  procedure_name_ar: string;
+  needs_lab: boolean;
+  tooth: number | null;
+  surfaces: string;
+  price: string;
+  discount: string;
+  net: string;
+  status: LineStatus;
+  sort_order: number;
+  notes: string;
+  appointment: number | null;
+  appointment_start: string | null;
+  completed_at: string | null;
+}
+
+export interface TreatmentPlan {
+  id: number;
+  patient: number;
+  patient_info: PatientInfo;
+  dentist: number;
+  dentist_name: { ar: string; en: string } | null;
+  title: string;
+  status: PlanStatus;
+  notes: string;
+  accepted_at: string | null;
+  lines: PlanLine[];
+  totals: { done: string; in_progress: string; planned: string; total: string; count: number; done_count: number };
+  created_at: string;
+}
+
+export interface VisitNote {
+  id: number;
+  patient: number;
+  patient_info: PatientInfo;
+  appointment: number | null;
+  dentist: number;
+  dentist_name: { ar: string; en: string } | null;
+  visit_date: string;
+  complaint: string;
+  findings: string;
+  work_done: string;
+  next_step: string;
+  lines: number[];
+  signed_at: string | null;
+  signed_by_name: string;
+  created_at: string;
+}
+
+export interface RxItem { drug: string; dose: string; frequency: string; duration: string; notes: string }
+export interface Prescription {
+  id: number;
+  patient: number;
+  dentist: number;
+  dentist_name: { ar: string; en: string } | null;
+  visit_note: number | null;
+  items: RxItem[];
+  notes: string;
+  created_at: string;
+}
+
+export interface ConsentTemplate { id: number; title_en: string; title_ar: string; body_en: string; body_ar: string; is_active: boolean }
+export interface PatientConsent {
+  id: number;
+  patient: number;
+  template: number | null;
+  plan_line: number | null;
+  language: "ar" | "en";
+  title: string;
+  body: string;
+  signer_name: string;
+  signer_relation: string;
+  signature: string;
+  signed_at: string | null;
+  created_at: string;
+}

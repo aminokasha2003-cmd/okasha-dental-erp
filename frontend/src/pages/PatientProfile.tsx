@@ -10,9 +10,20 @@ import { isoDay, timeOf } from "../dates";
 import type { Appointment, Patient } from "../types";
 import { patientName, useChoices } from "./Patients";
 import { AppointmentDialog } from "./Appointments";
+import {
+  ChartCard,
+  ConsentsCard,
+  IMAGING_KINDS,
+  ImagingCard,
+  PlanCard,
+  PlanProgress,
+  PrescriptionsCard,
+  VisitNotesCard,
+  useClinical,
+} from "./PatientClinical";
 
 // Layout follows the approved patient card design (handoff in the project files).
-// The dental chart, treatment plan, billing and lab sections arrive with phases 2 to 4.
+// Clinical sections live in PatientClinical.tsx; billing and lab arrive with phases 3 and 4.
 
 const CONDITIONS = [
   "diabetes",
@@ -69,6 +80,12 @@ export function PatientProfile() {
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(false);
   const [dialog, setDialog] = useState<{ appointment?: Appointment } | null>(null);
+  const [addFor, setAddFor] = useState<number | "any" | null>(null);
+  const [noteSignal, setNoteSignal] = useState(0);
+  const [filesVersion, setFilesVersion] = useState(0);
+  const clinicalOn = can("clinical");
+  const clinical = useClinical(Number(id), clinicalOn);
+  const addHandled = useCallback(() => setAddFor(null), []);
 
   const load = useCallback(() => {
     get<Patient>(`/api/patients/${id}/`)
@@ -105,8 +122,14 @@ export function PatientProfile() {
   };
   const otherName = lang === "ar" ? patient.name_en : patient.name_ar;
   const sections: { id: string; label: TKey; show: boolean }[] = [
+    { id: "chart", label: "chart.title", show: clinicalOn },
+    { id: "plan", label: "plan.title", show: clinicalOn },
     { id: "visits", label: "pt.visitHistory", show: can("appointments") },
+    { id: "clinical-notes", label: "note.title", show: clinicalOn },
+    { id: "imaging", label: "img.title", show: can("files") },
     { id: "medical", label: can("clinical") ? "pt.history" : "pt.alerts", show: true },
+    { id: "prescriptions", label: "rx.title", show: clinicalOn },
+    { id: "consents", label: "consent.title", show: clinicalOn },
     { id: "personal", label: "pt.personal", show: true },
     { id: "files", label: "pt.files", show: can("files") },
     { id: "notes", label: "pt.staffNotes", show: true },
@@ -145,8 +168,19 @@ export function PatientProfile() {
             )}
           </div>
           <div className="pf-actions">
+            {can("clinical", "create") && patient.is_active && (
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  setNoteSignal((n) => n + 1);
+                  document.getElementById("clinical-notes")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                <Icon name="plus" size={18} /> {t("pt.newNote")}
+              </button>
+            )}
             {can("appointments", "create") && patient.is_active && (
-              <button className="btn btn-primary" onClick={() => setDialog({})}>
+              <button className={can("clinical", "create") ? "btn" : "btn btn-primary"} onClick={() => setDialog({})}>
                 <Icon name="plus" size={18} /> {t("ap.book")}
               </button>
             )}
@@ -169,6 +203,7 @@ export function PatientProfile() {
             value={next ? `${new Date(next.start).toLocaleDateString(locale(lang), { weekday: "short", day: "numeric", month: "short" })}, ${timeOf(next.start)}` : t("pt.notBooked")}
             sub={next ? procedureLabel(next, lang) : ""}
           />
+          {clinicalOn && <PlanProgress plans={clinical.plans} />}
           <Stat label="pt.visitCount" value={String(past.filter((v) => v.status === "completed").length)} sub={t("pt.visitCountSub", { done: past.filter((v) => v.status === "completed").length, missed })} />
           {can("files") && <Stat label="pt.filesCount" value={fileCount === null ? "…" : String(fileCount)} sub={t("pt.filesSub")} />}
         </div>
@@ -187,15 +222,31 @@ export function PatientProfile() {
           ))}
       </nav>
 
+      {clinicalOn && (
+        <ChartCard
+          patient={patient}
+          data={clinical}
+          onAddProcedure={(tooth) => {
+            setAddFor(tooth);
+            document.getElementById("plan")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+        />
+      )}
+
       <div className="pf-columns">
         <div className="pf-main">
+          {clinicalOn && <PlanCard patient={patient} data={clinical} addFor={addFor} onAddHandled={addHandled} onVisitsChanged={loadVisits} />}
           {can("appointments") && <VisitHistory past={past} upcoming={upcoming.slice(1)} onOpen={(a) => setDialog({ appointment: a })} />}
+          {clinicalOn && <VisitNotesCard patient={patient} data={clinical} visits={visits} openSignal={noteSignal} />}
+          {can("files") && <ImagingCard patient={patient} onChanged={() => setFilesVersion((v) => v + 1)} />}
         </div>
         <div className="pf-side">
           <MedicalCard patient={patient} onChange={load} />
           {can("appointments") && next && <NextAppointment appointment={next} onReschedule={() => setDialog({ appointment: next })} onChanged={loadVisits} />}
+          {clinicalOn && <PrescriptionsCard patient={patient} data={clinical} />}
+          {clinicalOn && <ConsentsCard patient={patient} data={clinical} />}
           <PersonalCard patient={patient} branchName={choices.branches.find((b) => b.id === patient.home_branch)} dentistName={choices.dentists.find((d) => d.id === patient.preferred_dentist)} onEdit={can("patients", "edit") ? () => setEditing(true) : undefined} />
-          {can("files") && <FilesCard patientId={patient.id} onCount={setFileCount} />}
+          {can("files") && <FilesCard key={filesVersion} patientId={patient.id} onCount={setFileCount} />}
           <NotesCard patient={patient} />
         </div>
       </div>
@@ -588,7 +639,7 @@ function FilesCard({ patientId, onCount }: { patientId: number; onCount: (n: num
   const { t, lang } = useI18n();
   const { can } = useAuth();
   const [files, setFiles] = useState<FileRow[]>([]);
-  const [kind, setKind] = useState("xray");
+  const [kind, setKind] = useState("document");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const query = `attached_model=patients.patient&attached_id=${patientId}`;
@@ -619,12 +670,14 @@ function FilesCard({ patientId, onCount }: { patientId: number; onCount: (n: num
     }
   };
 
+  // X-rays, photos and scans show in the imaging section.
+  const documents = files.filter((f) => !IMAGING_KINDS.includes(f.kind));
   return (
     <SideCard id="files" title={t("pt.files")}>
       {can("files", "create") && (
         <div className="inline-form">
           <select aria-label={t("pt.fileKind")} value={kind} onChange={(e) => setKind(e.target.value)}>
-            {FILE_KINDS.map((k) => (
+            {FILE_KINDS.filter((k) => !IMAGING_KINDS.includes(k)).map((k) => (
               <option key={k} value={k}>{t(`file.kind.${k}` as TKey)}</option>
             ))}
           </select>
@@ -644,11 +697,11 @@ function FilesCard({ patientId, onCount }: { patientId: number; onCount: (n: num
         </div>
       )}
       {error && <p className="field-error" role="alert">{error}</p>}
-      {files.length === 0 ? (
+      {documents.length === 0 ? (
         <p className="muted small">{t("noRecords")}</p>
       ) : (
         <ul className="file-grid">
-          {files.map((f) => (
+          {documents.map((f) => (
             <li key={f.id}>
               <button className="file-tile-button" onClick={() => void openProtectedFile(f.download_url)}>
                 <span className={`file-tile kind-${f.kind}`}>{t(`file.kind.${f.kind}` as TKey)}</span>

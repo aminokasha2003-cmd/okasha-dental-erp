@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "erp.masterdata",
     "erp.patients",
     "erp.appointments",
+    "erp.clinical",
 ]
 
 MIDDLEWARE = [
