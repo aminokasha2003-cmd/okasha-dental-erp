@@ -493,6 +493,8 @@ export interface DialogInitial {
   branch?: number;
   chair?: number;
   dentist?: number;
+  procedure?: number;
+  reason?: string;
 }
 
 /** Book a new appointment, or move an existing one. */
@@ -521,11 +523,11 @@ export function AppointmentDialog({
     branch: existing?.branch ?? initial.branch ?? initial.patient?.home_branch ?? null,
     dentist: existing?.dentist ?? initial.dentist ?? initial.patient?.preferred_dentist ?? ownDentist ?? null,
     chair: existing?.chair ?? initial.chair ?? null,
-    procedure: existing?.procedure ?? null,
+    procedure: existing?.procedure ?? initial.procedure ?? null,
     day: existing ? isoDay(new Date(existing.start)) : initial.day ?? isoDay(new Date()),
     time: existing ? timeOf(existing.start) : initial.time ?? "",
     duration_minutes: existing?.duration_minutes ?? 30,
-    reason: existing?.reason ?? "",
+    reason: existing?.reason ?? initial.reason ?? "",
     notes: existing?.notes ?? "",
   }));
   const [procedures, setProcedures] = useState<Procedure[]>([]);
@@ -537,7 +539,14 @@ export function AppointmentDialog({
   const chairs = useChairs(branchId);
 
   useEffect(() => {
-    getAll<Procedure>("/api/masterdata/procedures/?is_active=true").then(setProcedures).catch(() => undefined);
+    getAll<Procedure>("/api/masterdata/procedures/?is_active=true")
+      .then((rows) => {
+        setProcedures(rows);
+        const proc = !existing && initial.procedure ? rows.find((p) => p.id === initial.procedure) : undefined;
+        if (proc?.default_duration_minutes) setValues((v) => ({ ...v, duration_minutes: proc.default_duration_minutes }));
+      })
+      .catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     if (!values.branch && branches[0]) setValues((v) => ({ ...v, branch: branches[0].id }));
