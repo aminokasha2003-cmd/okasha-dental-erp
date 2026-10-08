@@ -1,0 +1,30 @@
+# Production-style stack: PostgreSQL, the Django API, and the web app behind nginx.
+# Put HTTPS in front of port 8080 (for example Caddy or a cloud load balancer).
+services:
+  db:
+    image: postgres:16
+    env_file: .env
+    volumes: [pgdata:/var/lib/postgresql/data]
+    restart: unless-stopped
+  backend:
+    build: ./backend
+    env_file: .env
+    depends_on: [db]
+    volumes: [appdata:/data]
+    restart: unless-stopped
+  frontend:
+    build: ./frontend
+    depends_on: [backend]
+    ports: ["8080:80"]
+    restart: unless-stopped
+  backup:
+    # Daily database backup to the appdata volume, kept for BACKUP_KEEP_DAYS.
+    build: ./backend
+    env_file: .env
+    depends_on: [db]
+    volumes: [appdata:/data]
+    entrypoint: ["sh", "-c", "while true; do python manage.py backup_db; sleep 86400; done"]
+    restart: unless-stopped
+volumes:
+  pgdata:
+  appdata:
