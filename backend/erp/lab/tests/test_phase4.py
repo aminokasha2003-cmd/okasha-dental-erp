@@ -163,3 +163,54 @@ class RemakeAndCostTests(Phase4Base):
         # The plan line is free for a new order.
         self.login("drsara")
         self.order()
+
+
+class DirectOrderAndDashboardTests(Phase4Base):
+    def test_direct_order_without_plan_line_with_rx_details(self):
+        self.login("drsara")
+        other = self.add_patient(name_en="Walk In", name_ar="زائر", phone="01055554444")
+        response = self.client.post(
+            "/api/lab/cases/",
+            {
+                "patient": other["id"], "dentist": self.dentist.id, "restoration": "implant_crown", "material": "zirconia",
+                "teeth": "36", "due_date": str(self.due), "priority": "rush", "implant_system": "Straumann BLT",
+                "abutment": "ti_base", "retention": "screw", "enclosures": ["scan", "implant_parts", "scan"],
+                "stump_shade": "ND3", "margin": "chamfer",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201, response.content)
+        self.assertIsNone(response.data["procedure"])
+        self.assertEqual(response.data["enclosures"], ["implant_parts", "scan"])
+        self.assertEqual(response.data["patient_info"]["id"], other["id"])
+        bad = self.client.post("/api/lab/cases/", {"patient": other["id"], "due_date": str(self.due)}, format="json")
+        self.assertEqual(bad.status_code, 400)
+        self.assertIn("dentist", bad.data)
+        nothing = self.client.post("/api/lab/cases/", {"due_date": str(self.due), "dentist": self.dentist.id}, format="json")
+        self.assertIn("patient", nothing.data)
+
+    def test_hold_needs_a_reason_and_dashboard_counts(self):
+        case = self.order(priority="rush")
+        self.login("tech")
+        held = self.client.patch(f"/api/lab/cases/{case['id']}/", {"on_hold": True}, format="json")
+        self.assertEqual(held.status_code, 400)
+        held = self.client.patch(f"/api/lab/cases/{case['id']}/", {"on_hold": True, "hold_reason": "Waiting for bite"}, format="json")
+        self.assertEqual(held.status_code, 200, held.content)
+        summary = self.client.get("/api/lab/summary/").data
+        self.assertEqual((summary["rush"], summary["on_hold"]), (1, 1))
+        for stage in ("design", "milling", "finishing", "qc", "ready", "delivered"):
+            self.move(case, stage)
+        board = self.client.get("/api/lab/dashboard/").data
+        self.assertEqual((board["created"], board["delivered"]), (1, 1))
+        self.assertEqual(board["on_time"], 100)
+        self.assertIsNone(board["costs"])  # technicians do not see costs
+        self.login("owner")
+        self.assertIsNotNone(self.client.get("/api/lab/dashboard/").data["costs"])
+
+    def test_technician_can_look_up_patients_without_phones(self):
+        self.login("tech")
+        rows = self.client.get("/api/lab/cases/patients/", {"search": "mona"}).data
+        self.assertEqual(len(rows), 1)
+        self.assertNotIn("phone", rows[0])
+        self.login("reception")
+        self.assertEqual(self.client.get("/api/lab/cases/patients/", {"search": "mona"}).status_code, 403)

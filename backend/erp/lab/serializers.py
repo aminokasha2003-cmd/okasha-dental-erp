@@ -98,19 +98,30 @@ class LabCaseSerializer(ClinicScopedSerializer):
             "due_date", "appointment", "appointment_start", "stage", "events", "is_open", "overdue",
             "delivered_at", "cancelled_at", "cancel_reason", "remake_of", "remake_of_number", "remake_numbers",
             "remake_reason", "remake_note", "remake_charged_to", "material_cost", "labour_cost", "cost_total",
-            "cost_per_unit", "created_at",
+            "cost_per_unit", "created_at", "priority", "pan_number", "on_hold", "hold_reason", "shade_guide",
+            "stump_shade", "cervical_shade", "incisal_shade", "margin", "contacts", "occlusion", "pontic",
+            "implant_system", "implant_platform", "abutment", "retention", "enclosures", "outsourced_to",
+            "outsource_tracking",
         ]
         read_only_fields = [
-            "id", "number", "patient", "stage", "delivered_at", "cancelled_at", "cancel_reason", "remake_of",
+            "id", "number", "stage", "delivered_at", "cancelled_at", "cancel_reason", "remake_of",
             "remake_reason", "remake_note", "remake_charged_to", "created_at",
         ]
-        extra_kwargs = {"dentist": {"required": False}}
+        extra_kwargs = {"dentist": {"required": False}, "patient": {"required": False}}
+
+    def validate_enclosures(self, value):
+        allowed = {code for code, _label in LabCase.ENCLOSURES}
+        if not isinstance(value, list) or any(v not in allowed for v in value):
+            raise serializers.ValidationError("Unknown item in the enclosures list.")
+        return sorted(set(value))
 
     def get_patient_info(self, obj):
         return patient_info(obj.patient)
 
     def get_procedure(self, obj):
         line = obj.plan_line
+        if line is None:
+            return None
         return {"en": line.procedure.name_en, "ar": line.procedure.name_ar, "tooth": line.tooth, "status": line.status}
 
     def get_dentist_name(self, obj):
@@ -151,16 +162,27 @@ class LabCaseSerializer(ClinicScopedSerializer):
                 raise serializers.ValidationError({"plan_line": "A case stays with the plan line it was ordered from."})
             if "dentist" in attrs and attrs["dentist"] != instance.dentist:
                 raise serializers.ValidationError({"dentist": "The ordering dentist cannot be changed."})
-        if line is None:
-            raise serializers.ValidationError({"plan_line": "Choose the treatment plan line this work is for."})
-        if instance is None:
-            if line.status == "cancelled":
-                raise serializers.ValidationError({"plan_line": "That plan line is cancelled."})
-            if line.lab_cases.filter(cancelled_at__isnull=True).exclude(stage="delivered").exists():
-                raise serializers.ValidationError({"plan_line": "This plan line already has an open lab case."})
+            if "patient" in attrs and attrs["patient"] != instance.patient:
+                raise serializers.ValidationError({"patient": "A case stays with its patient."})
+            patient = instance.patient
+        else:
+            if line is None and attrs.get("patient") is None:
+                raise serializers.ValidationError({"patient": "Choose the patient, or the plan line this work is for."})
+            if line is not None:
+                if attrs.get("patient") is not None and attrs["patient"] != line.plan.patient:
+                    raise serializers.ValidationError({"plan_line": "That plan line belongs to another patient."})
+                if line.status == "cancelled":
+                    raise serializers.ValidationError({"plan_line": "That plan line is cancelled."})
+                if line.lab_cases.filter(cancelled_at__isnull=True).exclude(stage="delivered").exists():
+                    raise serializers.ValidationError({"plan_line": "This plan line already has an open lab case."})
+            elif attrs.get("dentist") is None:
+                raise serializers.ValidationError({"dentist": "Choose the dentist ordering this work."})
+            patient = line.plan.patient if line is not None else attrs["patient"]
         appointment = attrs.get("appointment")
-        if appointment is not None and appointment.patient_id != line.plan.patient_id:
+        if appointment is not None and appointment.patient_id != patient.pk:
             raise serializers.ValidationError({"appointment": "That visit belongs to another patient."})
+        if attrs.get("on_hold") and not attrs.get("hold_reason", getattr(instance, "hold_reason", "")):
+            raise serializers.ValidationError({"hold_reason": "Say what the case is waiting for."})
         return attrs
 
 

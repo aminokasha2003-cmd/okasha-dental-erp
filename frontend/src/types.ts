@@ -391,7 +391,7 @@ export interface PatientAccount { billed: string; paid: string; balance: string;
 
 // ---- Lab (phase 4) ----
 
-export type LabStage = "received" | "design" | "milling" | "finishing" | "ready" | "delivered";
+export type LabStage = "received" | "design" | "milling" | "finishing" | "qc" | "ready" | "delivered";
 
 export interface LabEvent {
   id: number;
@@ -407,7 +407,7 @@ export interface LabCase {
   patient: number;
   patient_info: { id: number; ar: string; en: string; file_number: string };
   plan_line: number;
-  procedure: { en: string; ar: string; tooth: number | null; status: string };
+  procedure: { en: string; ar: string; tooth: number | null; status: string } | null;
   dentist: number;
   dentist_name: { id: number; ar: string; en: string };
   technician: number | null;
@@ -439,6 +439,25 @@ export interface LabCase {
   cost_total: string;
   cost_per_unit: string;
   created_at: string;
+  priority: "normal" | "rush";
+  pan_number: string;
+  on_hold: boolean;
+  hold_reason: string;
+  shade_guide: string;
+  stump_shade: string;
+  cervical_shade: string;
+  incisal_shade: string;
+  margin: string;
+  contacts: string;
+  occlusion: string;
+  pontic: string;
+  implant_system: string;
+  implant_platform: string;
+  abutment: string;
+  retention: string;
+  enclosures: string[];
+  outsourced_to: string;
+  outsource_tracking: string;
 }
 
 export interface OrderableLine {
@@ -464,6 +483,36 @@ export interface LabSummary {
   unassigned: number;
   mine: number;
   attention: number;
+  due_tomorrow: number;
+  rush: number;
+  on_hold: number;
+  outsourced: number;
+}
+
+export interface LabDashboard {
+  start: string;
+  end: string;
+  created: number;
+  delivered: number;
+  units: number;
+  avg_days: number | null;
+  on_time: number | null;
+  remakes: number;
+  remake_rate: number;
+  remake_reasons: { reason: string; label: string; count: number }[];
+  remakes_lab: number;
+  remakes_clinic: number;
+  turnaround: { restoration: string; label: string; cases: number; avg_days: number }[];
+  technicians: { id: number; name: { ar: string; en: string }; open: number; delivered: number; units: number; avg_days: number | null }[];
+  weeks: { week: string; in: number; out: number }[];
+  by_restoration: { restoration: string; label: string; count: number }[];
+  outsourced: number;
+  costs: null | {
+    total: string;
+    per_unit: string;
+    remake_cost: string;
+    by_material: { material: string; label: string; cases: number; units: number; cost: string; per_unit: string }[];
+  };
 }
 
 export interface LabCostRow {
@@ -680,4 +729,28 @@ export interface ImplantTrace {
   results: ImplantTraceRow[];
   count: number;
   patients: number;
+}
+
+export interface FinanceDashboard {
+  start: string;
+  end: string;
+  bucket: "day" | "week" | "month";
+  now: { today: string; month: string; outstanding: string; overdue_installments: string; overdue_count: number };
+  billed: string;
+  collected: string;
+  billed_prev: string;
+  collected_prev: string;
+  invoice_count: number;
+  payment_count: number;
+  average_invoice: string;
+  discounts: string;
+  collection_rate: number | null;
+  trend: { period: string; billed: string; collected: string }[];
+  by_method: { method: string; total: string; count: number }[];
+  by_dentist: { id: number; name: { ar: string; en: string }; billed: string; collected: string }[];
+  by_procedure: { code: string; name: { ar: string; en: string }; count: number; billed: string }[];
+  aging: { "0_30": string; "31_60": string; "61_90": string; "90_plus": string };
+  top_debtors: { id: number; ar: string; en: string; file_number: string; balance: string; oldest: string }[];
+  installments_due: { id: number; invoice: number; invoice_number: string; due_date: string; remaining: string; overdue: boolean; patient: { id: number; ar: string; en: string; file_number: string } }[];
+  installments_upcoming_total: string;
 }

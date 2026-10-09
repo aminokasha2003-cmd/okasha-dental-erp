@@ -99,6 +99,10 @@ The look follows the approved Okasha design in `docs/design/` (colours, fonts, l
 
 - **Light and dark mode.** The sun and moon button in the top bar (and on the sign-in screen) switches theme. The choice is remembered on that device; until someone picks, it follows the device setting.
 - **Sidebar.** A greeting with today's date, work and setup groups, live counts (patients waiting, notes to sign), and gentle animations. It folds into an icon rail on desktop and becomes a slide-out menu on phones.
+- **Teeth chart.** The patient file shows both arches as real tooth shapes (molars, premolars, canines, incisors) on a curved arch. Tap a tooth to open it; each tooth's five surfaces colour in for caries, fillings and planned work.
+- **Patient file.** A hero header with an animated avatar ring, a sticky section bar that follows the scroll, and cards that rise in as you reach them.
+- **Lab orders.** "New lab order" on the lab page takes a direct order or work from a treatment plan through four steps: work, shade and design (shade guide, stump, cervical and incisal shades, margin, contacts, occlusion, pontic, implant system and abutment), what is sent with the case, and timing. Cases can be marked rush or put on hold with a reason, and there is a quality check stage before try-in.
+- **Dashboards with PDF reports.** The lab dashboard (volume, turnaround, on-time rate, remakes, technicians, cost by material) and the finance dashboard under Billing (billed vs collected, payment methods, money owed by age, top debtors, installments due, dentists, top procedures) take a date range and export to a PDF report with the clinic letterhead.
 
 ## Run it for development
 

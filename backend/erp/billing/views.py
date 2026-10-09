@@ -422,3 +422,158 @@ class PatientAccountView(APIView):
             "balance": money(billed - paid_on_invoices - on_account),
             "on_account": money(on_account),
         })
+
+
+class FinanceDashboardView(APIView):
+    """Money for a period: billed, collected, the trend, where it comes from, and
+    what is still owed. The `now` block (today, this month, outstanding, overdue)
+    ignores the period so the billing page header can use it."""
+
+    permission_classes = [ModulePermission]
+    module = "billing"
+
+    def get(self, request):
+        clinic = require_clinic(request.user)
+        today = timezone.localdate()
+        start = parse_day(request.query_params.get("start"), today.replace(day=1))
+        end = parse_day(request.query_params.get("end"), today)
+        if end < start:
+            raise ValidationError({"end": "The end date is before the start date."})
+        span = (end - start).days + 1
+        prev_start, prev_end = start - timedelta(days=span), start - timedelta(days=1)
+
+        invoices = list(
+            Invoice.objects.filter(clinic=clinic, status="issued", issue_date__range=(prev_start, end))
+            .prefetch_related("lines__procedure", "lines__dentist")
+        )
+        payments = list(
+            Payment.objects.filter(clinic=clinic, voided_at__isnull=True, paid_on__range=(prev_start, end))
+            .select_related("invoice")
+            .prefetch_related("invoice__lines__dentist")
+        )
+        cur_inv = [i for i in invoices if i.issue_date >= start]
+        cur_pay = [p for p in payments if p.paid_on >= start]
+        billed = sum((i.total for i in cur_inv), ZERO)
+        collected = sum((p.amount for p in cur_pay), ZERO)
+        discounts = sum((i.discount + sum((ln.discount for ln in i.lines.all()), ZERO) for i in cur_inv), ZERO)
+
+        # Trend buckets: days for a month or so, weeks up to half a year, then months.
+        if span <= 45:
+            def bucket(d):
+                return d
+        elif span <= 190:
+            def bucket(d):
+                return d - timedelta(days=d.weekday())
+        else:
+            def bucket(d):
+                return d.replace(day=1)
+        trend = {}
+        cursor = start
+        while cursor <= end:
+            trend.setdefault(bucket(cursor), {"billed": ZERO, "collected": ZERO})
+            cursor += timedelta(days=1)
+        for i in cur_inv:
+            trend[bucket(i.issue_date)]["billed"] += i.total
+        for p in cur_pay:
+            trend[bucket(p.paid_on)]["collected"] += p.amount
+
+        methods = {}
+        for p in cur_pay:
+            m = methods.setdefault(p.method, {"total": ZERO, "count": 0})
+            m["total"] += p.amount
+            m["count"] += 1
+
+        dentists, procedures = {}, {}
+        for i in cur_inv:
+            for ln in i.lines.all():
+                if ln.dentist_id:
+                    d = dentists.setdefault(ln.dentist_id, {"name": {"ar": ln.dentist.name_ar, "en": ln.dentist.name_en}, "billed": ZERO, "collected": ZERO})
+                    d["billed"] += ln.total
+                key = ln.procedure_id or f"x:{ln.description}"
+                pr = procedures.setdefault(key, {
+                    "code": ln.procedure.code if ln.procedure else "",
+                    "name": {"ar": ln.procedure.name_ar, "en": ln.procedure.name_en} if ln.procedure else {"ar": ln.description, "en": ln.description},
+                    "count": 0, "billed": ZERO,
+                })
+                pr["count"] += ln.quantity
+                pr["billed"] += ln.total
+        for p in cur_pay:
+            if not p.invoice or p.invoice.status != "issued":
+                continue
+            lines = list(p.invoice.lines.all())
+            gross = sum((ln.total for ln in lines), ZERO)
+            for ln in lines:
+                if gross > 0 and ln.dentist_id:
+                    d = dentists.setdefault(ln.dentist_id, {"name": {"ar": ln.dentist.name_ar, "en": ln.dentist.name_en}, "billed": ZERO, "collected": ZERO})
+                    d["collected"] += p.amount * ln.total / gross
+
+        # What is owed right now, aged by invoice date.
+        open_invoices = [
+            i for i in Invoice.objects.filter(clinic=clinic, status="issued").select_related("patient").prefetch_related("lines", ACTIVE_PAYMENTS)
+            if i.balance > 0
+        ]
+        aging = {"0_30": ZERO, "31_60": ZERO, "61_90": ZERO, "90_plus": ZERO}
+        debtors = {}
+        for i in open_invoices:
+            age = (today - i.issue_date).days
+            key = "0_30" if age <= 30 else "31_60" if age <= 60 else "61_90" if age <= 90 else "90_plus"
+            aging[key] += i.balance
+            row = debtors.setdefault(i.patient_id, {
+                "id": i.patient_id, "ar": i.patient.name_ar, "en": i.patient.name_en,
+                "file_number": i.patient.file_number, "balance": ZERO, "oldest": i.issue_date,
+            })
+            row["balance"] += i.balance
+            row["oldest"] = min(row["oldest"], i.issue_date)
+        top_debtors = sorted(debtors.values(), key=lambda r: -r["balance"])[:8]
+
+        installments = [
+            x for x in Installment.objects.filter(invoice__clinic=clinic, invoice__status="issued", due_date__lte=today + timedelta(days=30))
+            .select_related("invoice__patient").prefetch_related(ACTIVE_PAYMENTS)
+            if x.remaining > 0
+        ]
+        overdue = [x for x in installments if x.due_date < today]
+        upcoming = [x for x in installments if x.due_date >= today]
+
+        month_start = today.replace(day=1)
+        now_pay = Payment.objects.filter(clinic=clinic, voided_at__isnull=True, paid_on__range=(month_start, today)).values_list("paid_on", "amount")
+        now = {
+            "today": money(sum((a for d, a in now_pay if d == today), ZERO)),
+            "month": money(sum((a for _, a in now_pay), ZERO)),
+            "outstanding": money(sum(aging.values(), ZERO)),
+            "overdue_installments": money(sum((x.remaining for x in overdue), ZERO)),
+            "overdue_count": len(overdue),
+        }
+
+        def q(v):
+            return money(Decimal(v).quantize(Decimal("0.01")))
+
+        return Response({
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+            "bucket": "day" if span <= 45 else "week" if span <= 190 else "month",
+            "now": now,
+            "billed": money(billed),
+            "collected": money(collected),
+            "billed_prev": money(sum((i.total for i in invoices if i.issue_date < start), ZERO)),
+            "collected_prev": money(sum((p.amount for p in payments if p.paid_on < start), ZERO)),
+            "invoice_count": len(cur_inv),
+            "payment_count": len(cur_pay),
+            "average_invoice": q(billed / len(cur_inv)) if cur_inv else "0.00",
+            "discounts": money(discounts),
+            "collection_rate": round(float(collected / billed * 100), 1) if billed > 0 else None,
+            "trend": [{"period": k.isoformat(), "billed": money(v["billed"]), "collected": money(v["collected"])} for k, v in sorted(trend.items())],
+            "by_method": sorted(({"method": k, "total": money(v["total"]), "count": v["count"]} for k, v in methods.items()), key=lambda r: -Decimal(r["total"])),
+            "by_dentist": sorted(({"id": k, "name": v["name"], "billed": money(v["billed"]), "collected": q(v["collected"])} for k, v in dentists.items()), key=lambda r: -Decimal(r["billed"])),
+            "by_procedure": sorted(({**v, "billed": money(v["billed"])} for v in procedures.values()), key=lambda r: -Decimal(r["billed"]))[:10],
+            "aging": {k: money(v) for k, v in aging.items()},
+            "top_debtors": [{**r, "balance": money(r["balance"]), "oldest": r["oldest"].isoformat()} for r in top_debtors],
+            "installments_due": [
+                {
+                    "id": x.pk, "invoice": x.invoice_id, "invoice_number": x.invoice.number, "due_date": x.due_date.isoformat(),
+                    "remaining": money(x.remaining), "overdue": x.due_date < today,
+                    "patient": {"id": x.invoice.patient_id, "ar": x.invoice.patient.name_ar, "en": x.invoice.patient.name_en, "file_number": x.invoice.patient.file_number},
+                }
+                for x in sorted(installments, key=lambda x: x.due_date)[:10]
+            ],
+            "installments_upcoming_total": money(sum((x.remaining for x in upcoming), ZERO)),
+        })
