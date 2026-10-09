@@ -48,6 +48,7 @@ DEFAULT_ROLES = {
             "appointments": VCE,
             "clinical": ["view", "create", "edit", "approve"],
             "lab": VCE,
+            "inventory": ["view"],
         },
     ),
     "receptionist": (
@@ -59,6 +60,7 @@ DEFAULT_ROLES = {
             "patients": VCE,
             "appointments": ALL[:4],
             "billing": VCE,
+            "inventory": ["view"],
         },
     ),
     "assistant": (
@@ -70,7 +72,7 @@ DEFAULT_ROLES = {
             "patients": ["view"],
             "appointments": ["view"],
             "clinical": ["view"],
-            "inventory": ["view", "edit"],
+            "inventory": ["view", "create"],
         },
     ),
     "lab_technician": (
@@ -80,7 +82,7 @@ DEFAULT_ROLES = {
             "masterdata": ["view"],
             "files": VCE,
             "lab": VCE,
-            "inventory": ["view"],
+            "inventory": ["view", "create"],
         },
     ),
     "accountant": (
@@ -89,6 +91,7 @@ DEFAULT_ROLES = {
         {
             "masterdata": ["view"],
             "billing": ALL,
+            "inventory": ["view", "approve"],
             "staff": ["view", "edit"],
             "reports": ["view"],
         },
