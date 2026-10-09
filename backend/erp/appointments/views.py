@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.db import transaction
+from django.db.models import Exists, Max, OuterRef, Q
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from rest_framework.decorators import action
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 
 from erp.core.api import ClinicScopedViewSet
 from erp.masterdata.models import Branch
+from erp.patients.models import Patient
 
 from .models import Appointment
 from erp.core.notifications import notify
@@ -29,7 +31,7 @@ class AppointmentViewSet(ClinicScopedViewSet):
     queryset = Appointment.objects.select_related("patient", "dentist", "procedure").prefetch_related("patient__alerts")
     serializer_class = AppointmentSerializer
     module = "appointments"
-    required_actions = {"set_status": "edit", "queue": "view", "reminders": "view", "send_reminders": "edit", "remind": "edit"}
+    required_actions = {"set_status": "edit", "queue": "view", "recalls": "view", "reminders": "view", "send_reminders": "edit", "remind": "edit"}
     pagination_class = None  # the calendar loads a day or a week at a time
 
     def get_queryset(self):
@@ -113,6 +115,38 @@ class AppointmentViewSet(ClinicScopedViewSet):
             "waiting": [a for a in data if a["status"] == "arrived"],
             "in_chair": [a for a in data if a["status"] == "in_chair"],
         })
+
+    @action(detail=False, methods=["get"])
+    def recalls(self, request):
+        """Patients due for a check-up: last finished visit over N months ago and nothing booked since."""
+        try:
+            months = min(max(int(request.query_params.get("months", 6)), 1), 36)
+        except ValueError as exc:
+            raise ValidationError({"months": "Give a number of months."}) from exc
+        now = timezone.now()
+        cutoff = now - timedelta(days=round(months * 30.4))
+        patients = (
+            Patient.objects.filter(clinic=request.user.clinic, is_active=True)
+            .annotate(last_visit=Max("appointments__start", filter=Q(appointments__status="completed")))
+            .filter(last_visit__lt=cutoff)
+            .exclude(Exists(Appointment.objects.filter(patient=OuterRef("pk"), start__gte=now, status__in=("booked", "confirmed"))))
+            .order_by("last_visit")
+        )
+        total = patients.count()
+        rows = []
+        for p in patients[:30]:
+            last = p.appointments.filter(status="completed").select_related("procedure").order_by("-start").first()
+            rows.append({
+                "id": p.pk,
+                "ar": p.name_ar,
+                "en": p.name_en,
+                "phone": p.phone,
+                "whatsapp": p.whatsapp_opt_in,
+                "language": p.language,
+                "last_visit": p.last_visit,
+                "last_procedure": {"en": last.procedure.name_en, "ar": last.procedure.name_ar} if last and last.procedure else None,
+            })
+        return Response({"count": total, "months": months, "results": rows})
 
     @action(detail=True, methods=["post"])
     def remind(self, request, pk=None):

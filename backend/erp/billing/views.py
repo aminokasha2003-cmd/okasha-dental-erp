@@ -256,6 +256,28 @@ def cashbox_summary(clinic, day, branch):
     return payments, {k: money(v) for k, v in totals.items()}, totals.get("cash", ZERO)
 
 
+class DailyTakingsView(APIView):
+    """Money taken per day for the last N days (the home page's week chart)."""
+
+    permission_classes = [ModulePermission]
+    module = "billing"
+
+    def get(self, request):
+        clinic = require_clinic(request.user)
+        try:
+            days = min(max(int(request.query_params.get("days", 7)), 1), 62)
+        except ValueError as exc:
+            raise ValidationError({"days": "Give a number of days."}) from exc
+        today = timezone.localdate()
+        first = today - timedelta(days=days - 1)
+        totals = {first + timedelta(days=i): ZERO for i in range(days)}
+        for paid_on, amount in Payment.objects.filter(
+            clinic=clinic, voided_at__isnull=True, paid_on__gte=first, paid_on__lte=today
+        ).values_list("paid_on", "amount"):
+            totals[paid_on] += amount
+        return Response([{"date": day, "total": money(total)} for day, total in totals.items()])
+
+
 class CashboxView(APIView):
     """The day's takings for one branch, and closing the day."""
 

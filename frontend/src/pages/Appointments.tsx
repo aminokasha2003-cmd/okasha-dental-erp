@@ -140,6 +140,15 @@ export function Appointments() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [dialog, setDialog] = useState<DialogInitial | null>(null);
+  // The home page's "Book" button opens the booking form straight away.
+  useEffect(() => {
+    if (params.get("book") !== "1" || !loaded) return;
+    setDialog({ day, branch: branch ?? undefined, dentist: dentistFilter ? Number(dentistFilter) : undefined });
+    const next = new URLSearchParams(params);
+    next.delete("book");
+    setParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, loaded]);
   const [selected, setSelected] = useState<Appointment | null>(null);
   const isToday = day === isoDay(new Date());
 

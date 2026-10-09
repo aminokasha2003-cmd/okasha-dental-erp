@@ -265,3 +265,27 @@ class PatientFileTests(Phase1Base):
         self.assertIsNotNone(response.data["reminder_sent_at"])
         self.login("assist")
         self.assertEqual(self.client.post(f"/api/appointments/{appointment['id']}/remind/").status_code, 403)
+
+
+class RecallTests(Phase1Base):
+    def test_patients_due_for_a_check_up(self):
+        self.login("reception")
+        due = self.add_patient(name_en="Due", name_ar="مستحق", phone="01011111111")
+        booked = self.add_patient(name_en="Booked", name_ar="محجوز", phone="01022222222")
+        recent = self.add_patient(name_en="Recent", name_ar="حديث", phone="01033333333")
+        old = timezone.now() - timedelta(days=220)
+        for p in (due, booked):
+            Appointment.objects.create(
+                clinic=self.clinic, patient_id=p["id"], dentist=self.dentist, branch=self.branch,
+                start=old, status="completed", procedure=self.root_canal,
+            )
+        Appointment.objects.create(
+            clinic=self.clinic, patient_id=recent["id"], dentist=self.dentist, branch=self.branch,
+            start=timezone.now() - timedelta(days=20), status="completed",
+        )
+        self.book(booked["id"], at(self.tomorrow, 11))
+        data = self.client.get("/api/appointments/recalls/").data
+        self.assertEqual([r["id"] for r in data["results"]], [due["id"]])
+        self.assertEqual(data["results"][0]["last_procedure"]["en"], "Root canal")
+        self.login("assist")
+        self.assertEqual(self.client.get("/api/appointments/recalls/").status_code, 200)

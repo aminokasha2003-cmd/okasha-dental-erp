@@ -11,6 +11,7 @@ router.register("closings", views.ClosingViewSet, basename="closing")
 
 urlpatterns = [
     path("cashbox/", views.CashboxView.as_view(), name="cashbox"),
+    path("daily/", views.DailyTakingsView.as_view(), name="daily-takings"),
     path("commissions/", views.CommissionReportView.as_view(), name="commissions"),
     path("patients/<int:patient_id>/account/", views.PatientAccountView.as_view(), name="patient-account"),
     *router.urls,
