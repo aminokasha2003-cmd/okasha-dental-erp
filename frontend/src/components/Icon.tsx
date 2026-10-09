@@ -29,6 +29,11 @@ const PATHS = {
   arrow: "M5 12h14M13 6l6 6-6 6",
   upload: "M12 16V4M7 9l5-5 5 5M4 20h16",
   cash: "M3 6h18v12H3zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 9v.01M18 15v.01",
+  clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
+  download: "M12 4v12M7 11l5 5 5-5M4 20h16",
+  bolt: "M13 2L4 14h7l-1 8 9-12h-7z",
+  trend: "M3 17l6-6 4 4 8-8M15 7h6v6",
+  pie: "M12 3a9 9 0 1 0 9 9h-9zM15 3.5A9 9 0 0 1 20.5 9H15z",
 } as const;
 
 export type IconName = keyof typeof PATHS;
