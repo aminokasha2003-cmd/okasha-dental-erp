@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { ApiError, del, getAll, patch, post } from "../api";
 import { useAuth } from "../auth";
 import { useI18n, type TKey } from "../i18n";
@@ -115,18 +116,26 @@ export function Field({
 }
 
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  const backdrop = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    // Escape closes only the topmost dialog when one opens over another.
+    const onKey = (e: KeyboardEvent) => {
+      const all = document.querySelectorAll(".modal-backdrop");
+      if (e.key === "Escape" && all[all.length - 1] === backdrop.current) onClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
-  return (
-    <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <h2 id="modal-title">{title}</h2>
+  const titleId = useId();
+  // Rendered on <body> so a card's overflow or animation never clips it.
+  return createPortal(
+    <div ref={backdrop} className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+        <h2 id={titleId} className="modal-title">{title}</h2>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

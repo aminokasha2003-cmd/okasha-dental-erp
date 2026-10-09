@@ -1,6 +1,9 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState, type CSSProperties } from "react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { get } from "../api";
 import { useAuth } from "../auth";
 import { useI18n, type TKey } from "../i18n";
+import { useTheme } from "../theme";
 import { AnimatedLogo } from "./AnimatedLogo";
 import { Icon, type IconName } from "./Icon";
 
@@ -11,8 +14,8 @@ interface NavItem {
   module?: string;
 }
 
-// One slot per module. Phases 1 to 4 already have a page that says when they arrive.
-const VERSION_1: NavItem[] = [
+// One slot per module. Modules still to come show as "soon".
+const WORK: NavItem[] = [
   { to: "/", label: "nav.home", icon: "home" },
   { to: "/patients", label: "nav.patients", icon: "patients", module: "patients" },
   { to: "/appointments", label: "nav.appointments", icon: "calendar", module: "appointments" },
@@ -35,24 +38,108 @@ const LATER: NavItem[] = [
   { to: "/crm", label: "nav.crm", icon: "chart" },
 ];
 
+const COLLAPSED_KEY = "erp.sidebar.collapsed";
+
+function readCollapsed() {
+  try {
+    return window.localStorage.getItem(COLLAPSED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/** Small counts on the sidebar: patients waiting, notes to sign. */
+function useBadges() {
+  const { can } = useAuth();
+  const [badges, setBadges] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const load = () => {
+      if (can("appointments"))
+        get<{ waiting: unknown[] }>("/api/appointments/queue/")
+          .then((q) => setBadges((b) => ({ ...b, "/appointments": q.waiting.length })))
+          .catch(() => undefined);
+      if (can("clinical", "approve"))
+        get<unknown[]>("/api/clinical/visit-notes/?unsigned=1")
+          .then((rows) => setBadges((b) => ({ ...b, "/clinical": rows.length })))
+          .catch(() => undefined);
+    };
+    load();
+    const timer = window.setInterval(load, 60_000);
+    return () => window.clearInterval(timer);
+  }, [can]);
+  return badges;
+}
+
+function greetingKey(): TKey {
+  const hour = new Date().getHours();
+  return hour < 12 ? "greet.morning" : hour < 17 ? "greet.afternoon" : "greet.evening";
+}
+
 export function Layout() {
   const { t, lang, name } = useI18n();
   const { me, can, logout, changeLanguage } = useAuth();
+  const { theme, toggle } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+  const badges = useBadges();
+  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const [open, setOpen] = useState(false);
   const visible = (items: NavItem[]) => items.filter((i) => !i.module || can(i.module));
   const displayName = me ? [me.first_name, me.last_name].filter(Boolean).join(" ") || me.username : "";
+  const firstName = me?.first_name || displayName;
   const roleNames = me?.roles.map((r) => name(r)).join(" · ");
 
-  const link = (item: NavItem) => (
-    <NavLink key={item.to} to={item.to} end={item.to === "/"} className="nav-link">
-      <Icon name={item.icon} />
-      <span>{t(item.label)}</span>
-    </NavLink>
-  );
+  // Close the phone menu after moving to another page.
+  useEffect(() => setOpen(false), [location.pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const toggleCollapsed = () => {
+    setCollapsed((c) => {
+      try {
+        window.localStorage.setItem(COLLAPSED_KEY, c ? "0" : "1");
+      } catch {
+        /* storage blocked */
+      }
+      return !c;
+    });
+  };
+
+  let index = 0;
+  const link = (item: NavItem) => {
+    const badge = badges[item.to];
+    return (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        end={item.to === "/"}
+        className="nav-link"
+        title={collapsed ? t(item.label) : undefined}
+        style={{ "--i": index++ } as CSSProperties}
+      >
+        <span className="nav-icon">
+          <Icon name={item.icon} />
+        </span>
+        <span className="nav-text">{t(item.label)}</span>
+        {badge ? (
+          <span className="nav-badge" aria-label={t("nav.badge", { n: badge })}>
+            {badge}
+          </span>
+        ) : null}
+      </NavLink>
+    );
+  };
+
+  const date = new Date().toLocaleDateString(lang === "ar" ? "ar-EG" : "en-GB", { weekday: "long", day: "numeric", month: "long" });
 
   return (
-    <div className="shell">
-      <aside className="sidebar">
+    <div className={`shell ${collapsed ? "is-collapsed" : ""} ${open ? "menu-open" : ""}`}>
+      <div className="sidebar-scrim" onClick={() => setOpen(false)} aria-hidden="true" />
+      <aside className="sidebar" id="sidebar">
         <div className="brand">
           <div className="brand-mark">
             <AnimatedLogo tone="dark" />
@@ -61,23 +148,55 @@ export function Layout() {
             <strong>{me?.clinic ? name(me.clinic) : t("appName")}</strong>
             <span className="brand-sub">Clinic ERP</span>
           </div>
+          <button className="side-icon-btn collapse-btn" onClick={toggleCollapsed} aria-label={collapsed ? t("nav.expand") : t("nav.collapse")} title={collapsed ? t("nav.expand") : t("nav.collapse")}>
+            <Icon name="collapse" size={18} />
+          </button>
+          <button className="side-icon-btn close-btn" onClick={() => setOpen(false)} aria-label={t("close")}>
+            <Icon name="close" size={18} />
+          </button>
         </div>
-        <nav aria-label="Main">
-          <p className="nav-group">{t("version1")}</p>
-          {visible(VERSION_1).map(link)}
+
+        <div className="greeting">
+          <p className="greeting-hello">{t(greetingKey(), { name: firstName })}</p>
+          <p className="greeting-date">{date}</p>
+        </div>
+
+        <nav aria-label="Main" className="side-nav">
+          <p className="nav-group">{t("group.work")}</p>
+          {visible(WORK).map(link)}
           {visible(SETUP).length > 0 && <p className="nav-group">{t("group.setup")}</p>}
           {visible(SETUP).map(link)}
           <p className="nav-group">{t("comingLater")}</p>
           {LATER.map((item) => (
-            <span key={item.to} className="nav-link nav-disabled" aria-disabled="true">
-              <Icon name={item.icon} />
-              <span>{t(item.label)}</span>
+            <span key={item.to} className="nav-link nav-disabled" aria-disabled="true" title={collapsed ? t(item.label) : undefined} style={{ "--i": index++ } as CSSProperties}>
+              <span className="nav-icon">
+                <Icon name={item.icon} />
+              </span>
+              <span className="nav-text">{t(item.label)}</span>
+              <span className="nav-soon">{t("nav.soon")}</span>
             </span>
           ))}
         </nav>
+
+        <div className="side-user">
+          <div className="avatar" aria-hidden="true">
+            {displayName.slice(0, 1).toUpperCase()}
+          </div>
+          <div className="user-text">
+            <strong>{displayName}</strong>
+            <span>{roleNames}</span>
+          </div>
+          <button className="side-icon-btn" onClick={logout} aria-label={t("signOut")} title={t("signOut")}>
+            <Icon name="logout" size={18} />
+          </button>
+        </div>
       </aside>
+
       <div className="main">
         <header className="topbar">
+          <button className="btn btn-icon menu-btn" onClick={() => setOpen(true)} aria-label={t("nav.menu")} aria-controls="sidebar" aria-expanded={open}>
+            <Icon name="menu" />
+          </button>
           {can("patients") ? (
             <form
               className="top-search"
@@ -93,6 +212,7 @@ export function Layout() {
             </form>
           ) : null}
           <div className="topbar-spacer" />
+          <ThemeButton theme={theme} onToggle={toggle} />
           <div className="segmented" role="group" aria-label={t("language")}>
             <button aria-pressed={lang === "en"} onClick={() => changeLanguage("en")} lang="en">
               English
@@ -101,23 +221,24 @@ export function Layout() {
               العربية
             </button>
           </div>
-          <div className="user-chip">
-            <div className="avatar" aria-hidden="true">
-              {displayName.slice(0, 1).toUpperCase()}
-            </div>
-            <div className="user-text">
-              <strong>{displayName}</strong>
-              <span className="muted">{roleNames}</span>
-            </div>
-          </div>
-          <button className="btn" onClick={logout}>
-            {t("signOut")}
-          </button>
         </header>
         <main className="content">
           <Outlet />
         </main>
       </div>
     </div>
+  );
+}
+
+export function ThemeButton({ theme, onToggle }: { theme: string; onToggle: () => void }) {
+  const { t } = useI18n();
+  const label = theme === "dark" ? t("theme.toLight") : t("theme.toDark");
+  return (
+    <button type="button" className="btn btn-icon theme-btn" onClick={onToggle} aria-label={label} title={label}>
+      <span className={`theme-icons ${theme}`} aria-hidden="true">
+        <Icon name="sun" className="theme-sun" />
+        <Icon name="moon" className="theme-moon" />
+      </span>
+    </button>
   );
 }

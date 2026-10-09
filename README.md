@@ -68,6 +68,21 @@ The look follows the approved Okasha design in `docs/design/` (colours, fonts, l
 - **Clinical records page.** Visit notes waiting for signature and treatment plans in progress across the clinic.
 - Reception never sees the chart, plans, notes, prescriptions or consents. Assistants can read them but not change or sign them.
 
+## What phase 3 gives you
+
+- **Invoices from the treatment plan.** A new invoice lists the patient's plan lines not yet billed, with finished work already ticked, plus any extra items (an X-ray, materials). Numbers run INV-00001, ... per clinic. A line can only be billed once, and an invoice can be voided with a reason only while nothing is paid on it.
+- **Payments and receipts.** Cash, InstaPay, card, mobile wallet or bank transfer, against an invoice, one of its installments, or on account. Each payment gets a receipt number (RC-00001, ...) and prints on the clinic letterhead. A payment can't be more than what is still owed, and voiding one needs a reason.
+- **Installments.** Split an invoice's balance into monthly installments. The Installments tab lists what is due in the next two weeks and what is overdue, with the patient's phone.
+- **Daily cashbox.** Today's totals by payment method and every receipt. Closing the day records the cash counted in the drawer and the difference, and after that no payment can be added or voided for that day.
+- **Doctor commissions.** For a date range, what each dentist billed and collected and their commission under the rule set on their staff record (a percentage of collected, a percentage of billed, or a fixed amount per procedure). Payments are shared across an invoice's lines in proportion to their value. Owner and accountant only.
+- **Patient balance.** The patient file shows the balance due at the top and a billing section with billed, paid and owed, a paid bar, invoices and payments.
+- Reception can invoice, take payments and close the day. Dentists don't see billing. Only the owner and accountant can void.
+
+## Look and feel
+
+- **Light and dark mode.** The sun and moon button in the top bar (and on the sign-in screen) switches theme. The choice is remembered on that device; until someone picks, it follows the device setting.
+- **Sidebar.** A greeting with today's date, work and setup groups, live counts (patients waiting, notes to sign), and gentle animations. It folds into an icon rail on desktop and becomes a slide-out menu on phones.
+
 ## Run it for development
 
 You need Python 3.12+, Node 20+ and PostgreSQL 16.
@@ -137,6 +152,7 @@ The same `Dockerfile` runs on any host that builds containers (Railway, Fly.io, 
 
 ## Not done yet
 
+- Billing has no tax receipts for the Egyptian Tax Authority e-receipt system yet, and no refunds beyond voiding a payment.
 - API error messages are in English only. Screen text is in both languages.
 - The calendar shows one day at a time. A week view, online booking and recurring visits are not built.
 - WhatsApp and SMS need a provider (for example the WhatsApp Business API through a local partner) before messages really go out.

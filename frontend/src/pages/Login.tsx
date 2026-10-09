@@ -2,10 +2,13 @@ import { useState, type FormEvent } from "react";
 import { useAuth } from "../auth";
 import { useI18n } from "../i18n";
 import { AnimatedLogo } from "../components/AnimatedLogo";
+import { ThemeButton } from "../components/Layout";
+import { useTheme } from "../theme";
 
 export function Login() {
   const { t, lang, setLang } = useI18n();
   const { login } = useAuth();
+  const { theme, toggle } = useTheme();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,9 +29,12 @@ export function Login() {
 
   return (
     <div className="login-page">
+      <div className="login-theme">
+        <ThemeButton theme={theme} onToggle={toggle} />
+      </div>
       <form className="card login-card" onSubmit={submit}>
         <div className="login-head">
-          <AnimatedLogo mode="intro" size={72} />
+          <AnimatedLogo mode="intro" size={72} tone={theme === "dark" ? "dark" : "light"} />
           <h1>{t("appName")}</h1>
         </div>
         <div className="field">

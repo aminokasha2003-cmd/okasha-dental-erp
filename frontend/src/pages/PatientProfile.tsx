@@ -21,9 +21,10 @@ import {
   VisitNotesCard,
   useClinical,
 } from "./PatientClinical";
+import { BalanceStat, BillingCard, useAccount } from "./PatientBilling";
 
 // Layout follows the approved patient card design (handoff in the project files).
-// Clinical sections live in PatientClinical.tsx; billing and lab arrive with phases 3 and 4.
+// Clinical sections live in PatientClinical.tsx, billing in PatientBilling.tsx; lab arrives with phase 4.
 
 const CONDITIONS = [
   "diabetes",
@@ -85,6 +86,9 @@ export function PatientProfile() {
   const [filesVersion, setFilesVersion] = useState(0);
   const clinicalOn = can("clinical");
   const clinical = useClinical(Number(id), clinicalOn);
+  const billingOn = can("billing");
+  const account = useAccount(Number(id), billingOn);
+  const [paySignal, setPaySignal] = useState(0);
   const addHandled = useCallback(() => setAddFor(null), []);
 
   const load = useCallback(() => {
@@ -124,6 +128,7 @@ export function PatientProfile() {
   const sections: { id: string; label: TKey; show: boolean }[] = [
     { id: "chart", label: "chart.title", show: clinicalOn },
     { id: "plan", label: "plan.title", show: clinicalOn },
+    { id: "billing", label: "bill.title", show: billingOn },
     { id: "visits", label: "pt.visitHistory", show: can("appointments") },
     { id: "clinical-notes", label: "note.title", show: clinicalOn },
     { id: "imaging", label: "img.title", show: can("files") },
@@ -184,6 +189,17 @@ export function PatientProfile() {
                 <Icon name="plus" size={18} /> {t("ap.book")}
               </button>
             )}
+            {can("billing", "create") && patient.is_active && (
+              <button
+                className="btn"
+                onClick={() => {
+                  setPaySignal((n) => n + 1);
+                  document.getElementById("billing")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                <Icon name="wallet" size={18} /> {t("bill.addPayment")}
+              </button>
+            )}
             {can("patients", "edit") && <button className="btn" onClick={() => setEditing(true)}>{t("edit")}</button>}
             {can("patients", "delete") && patient.is_active && (
               <button className="btn btn-danger" onClick={() => void setActive(false)}>{t("pt.closeFile")}</button>
@@ -204,6 +220,7 @@ export function PatientProfile() {
             sub={next ? procedureLabel(next, lang) : ""}
           />
           {clinicalOn && <PlanProgress plans={clinical.plans} />}
+          {billingOn && <BalanceStat account={account.account} />}
           <Stat label="pt.visitCount" value={String(past.filter((v) => v.status === "completed").length)} sub={t("pt.visitCountSub", { done: past.filter((v) => v.status === "completed").length, missed })} />
           {can("files") && <Stat label="pt.filesCount" value={fileCount === null ? "…" : String(fileCount)} sub={t("pt.filesSub")} />}
         </div>
@@ -236,6 +253,7 @@ export function PatientProfile() {
       <div className="pf-columns">
         <div className="pf-main">
           {clinicalOn && <PlanCard patient={patient} data={clinical} addFor={addFor} onAddHandled={addHandled} onVisitsChanged={loadVisits} />}
+          {billingOn && <BillingCard patient={patient} data={account} openSignal={paySignal} />}
           {can("appointments") && <VisitHistory past={past} upcoming={upcoming.slice(1)} onOpen={(a) => setDialog({ appointment: a })} />}
           {clinicalOn && <VisitNotesCard patient={patient} data={clinical} visits={visits} openSignal={noteSignal} />}
           {can("files") && <ImagingCard patient={patient} onChanged={() => setFilesVersion((v) => v + 1)} />}
