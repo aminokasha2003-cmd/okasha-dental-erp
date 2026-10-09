@@ -1117,8 +1117,8 @@ html::-webkit-scrollbar { display: none; }
 .chart-legend-row span { display: inline-flex; align-items: center; gap: 6px; }
 .chart-key { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--series-1); }
 .chart-key.s2 { background: var(--series-2); }
-.col-chart { position: relative; height: calc(var(--h) + 24px); padding-inline-start: 38px; }
-.col-grid { position: absolute; inset: 0 0 24px 38px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+.col-chart { position: relative; height: calc(var(--h) + 24px); padding-inline-start: 58px; }
+.col-grid { position: absolute; inset-block: 0 24px; inset-inline: 58px 0; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
 .col-grid span { border-top: 1px solid var(--line-soft); position: relative; height: 0; }
 .col-grid em { position: absolute; inset-inline-end: calc(100% + 6px); top: -8px; font-style: normal; font-size: 11px; color: var(--muted); white-space: nowrap; }
 .col-plot { position: relative; height: 100%; display: flex; gap: 4px; align-items: stretch; }
@@ -1200,3 +1200,19 @@ html::-webkit-scrollbar { display: none; }
 .enclosure.on { background: var(--mint-soft); border-color: var(--mint); color: var(--mint-ink); font-weight: 600; }
 @media (max-width: 600px) { .rx-steps { grid-template-columns: repeat(2, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .kpi, .dash-card, .col-bar, .bar-list li, .bar-list-fill, .lab-hero, .lab-card, .rx-step { animation: none; } }
+
+/* Billing redesign */
+.bill-hero::after { background: radial-gradient(circle, rgba(227, 149, 127, 0.28), transparent 70%); }
+.bill-hero .lab-hero-stat { min-width: 132px; }
+.bill-hero .lab-hero-stat strong { font-size: 22px; font-variant-numeric: tabular-nums; }
+.method-card { position: relative; overflow: hidden; border-radius: 18px; transition: transform 0.2s, box-shadow 0.2s; }
+.method-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-2, 0 10px 24px rgba(16, 32, 48, 0.12)); }
+.method-card.total { background: var(--hero); border: 0; }
+.method-card.total .bill-figure { color: #fff; font-size: 26px; }
+.method-icon { position: absolute; inset-inline-end: 14px; top: 14px; width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; background: var(--coral-soft); color: var(--coral-deep); }
+.method-share { display: block; height: 4px; border-radius: 4px; background: var(--surface-2); margin-top: 10px; overflow: hidden; }
+.method-share i { display: block; height: 100%; border-radius: 4px; background: var(--series-1); transition: width 0.6s ease; }
+.mini-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.mini-list li { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 8px 4px; border-bottom: 1px solid var(--line); }
+.mini-list li:last-child { border-bottom: 0; }
+.mini-list .num { min-width: 80px; text-align: end; font-variant-numeric: tabular-nums; }

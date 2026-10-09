@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { get, getAll, post } from "../api";
 import { useAuth } from "../auth";
@@ -6,10 +6,13 @@ import { useI18n, type TKey } from "../i18n";
 import { Icon } from "../components/Icon";
 import { fmtDate, money } from "../format";
 import type { Page } from "../api";
-import type { Branch, Cashbox, CommissionRow, Installment, Invoice } from "../types";
+import type { Branch, Cashbox, CommissionRow, FinanceDashboard, Installment, Invoice } from "../types";
+import { BarList, ColumnChart, KpiTile } from "../components/Charts";
+import { exportPdf } from "../components/pdf";
+import { useLetterhead } from "../components/print";
 import { INST_PILL, InvoiceView, METHODS, PAY_PILL, errorText, personName, usePrintBilling, useCurrency } from "./BillingParts";
 
-type Tab = "today" | "invoices" | "installments" | "commissions";
+type Tab = "today" | "invoices" | "installments" | "dashboard" | "commissions";
 
 function isoToday() {
   return new Date().toLocaleDateString("en-CA");
@@ -17,22 +20,46 @@ function isoToday() {
 
 /** Billing desk: the day's cashbox, invoices, installments due, commissions. */
 export function Billing() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { can } = useAuth();
+  const currency = useCurrency();
+  const [now, setNow] = useState<FinanceDashboard["now"] | null>(null);
+  useEffect(() => {
+    get<FinanceDashboard>("/api/billing/dashboard/").then((d) => setNow(d.now)).catch(() => undefined);
+  }, []);
   const [params, setParams] = useSearchParams();
   const tabs: { id: Tab; label: TKey; show: boolean }[] = [
     { id: "today", label: "bill.tab.today", show: true },
     { id: "invoices", label: "bill.invoices", show: true },
     { id: "installments", label: "bill.installments", show: true },
+    { id: "dashboard", label: "fin.tab", show: can("billing", "approve") },
     { id: "commissions", label: "bill.commissions", show: can("billing", "approve") },
   ];
   const tab = (params.get("tab") as Tab) || "today";
 
   return (
     <div className="page">
-      <div className="page-head">
-        <h1>{t("bill.title")}</h1>
-      </div>
+      <section className="lab-hero bill-hero">
+        <div>
+          <h1>{t("bill.title")}</h1>
+          <p>{t("fin.heroSub")}</p>
+        </div>
+        {now && (
+          <div className="lab-hero-stats">
+            {[
+              { label: "fin.today" as TKey, value: now.today, tab: "today" as Tab },
+              { label: "fin.thisMonth" as TKey, value: now.month, tab: "dashboard" as Tab },
+              { label: "fin.outstanding" as TKey, value: now.outstanding, tab: "invoices" as Tab, tone: Number(now.outstanding) > 0 ? "accent" : "" },
+              { label: "fin.overdueInst" as TKey, value: now.overdue_installments, tab: "installments" as Tab, tone: now.overdue_count ? "warn" : "", sub: now.overdue_count },
+            ].map((x) => (
+              <button key={x.label} className={`lab-hero-stat ${x.tone ?? ""}`} onClick={() => setParams({ tab: x.tab }, { replace: true })}>
+                <strong>{money(x.value, lang)}</strong>
+                <span>{t(x.label)} · {currency}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
       <div className="segmented tabs" role="tablist">
         {tabs
           .filter((x) => x.show)
@@ -45,6 +72,7 @@ export function Billing() {
       {tab === "today" && <CashboxTab />}
       {tab === "invoices" && <InvoicesTab />}
       {tab === "installments" && <InstallmentsTab />}
+      {tab === "dashboard" && can("billing", "approve") && <FinanceTab />}
       {tab === "commissions" && can("billing", "approve") && <CommissionsTab />}
     </div>
   );
@@ -121,12 +149,17 @@ function CashboxTab() {
               <p className="bill-figure">{money(box.total, lang)} <span>{currency}</span></p>
               <p className="muted small">{t("box.receipts", { n: box.payments.length })}</p>
             </div>
-            {METHODS.map((m) => (
-              <div key={m} className="card method-card">
-                <p className="overline">{t(`pay.${m}` as TKey)}</p>
-                <p className="bill-figure">{money(box.totals[m] ?? 0, lang)}</p>
-              </div>
-            ))}
+            {METHODS.map((m, i) => {
+              const share = Number(box.total) > 0 ? (Number(box.totals[m] ?? 0) / Number(box.total)) * 100 : 0;
+              return (
+                <div key={m} className="card method-card" style={{ animationDelay: `${(i + 1) * 60}ms` }}>
+                  <span className="method-icon" aria-hidden="true"><Icon name={m === "cash" ? "cash" : m === "card" ? "receipt" : "wallet"} size={18} /></span>
+                  <p className="overline">{t(`pay.${m}` as TKey)}</p>
+                  <p className="bill-figure">{money(box.totals[m] ?? 0, lang)}</p>
+                  <span className="method-share" aria-label={`${Math.round(share)}%`}><i style={{ width: `${share}%` }} /></span>
+                </div>
+              );
+            })}
           </div>
           <div className="two-col">
             <section className="card">
@@ -373,5 +406,196 @@ function CommissionsTab() {
         </div>
       )}
     </section>
+  );
+}
+
+function addDays(iso: string, days: number) {
+  const d = new Date(`${iso}T12:00:00`);
+  d.setDate(d.getDate() + days);
+  return d.toLocaleDateString("en-CA");
+}
+
+function delta(cur: string, prev: string) {
+  const c = Number(cur);
+  const p = Number(prev);
+  if (!p) return null;
+  return Math.round(((c - p) / p) * 100);
+}
+
+/** Owner's money dashboard for a period, exportable as a PDF report. */
+function FinanceTab() {
+  const { t, lang } = useI18n();
+  const currency = useCurrency();
+  const letterhead = useLetterhead(lang);
+  const ref = useRef<HTMLDivElement>(null);
+  const [start, setStart] = useState(() => isoToday().slice(0, 8) + "01");
+  const [end, setEnd] = useState(isoToday());
+  const [data, setData] = useState<FinanceDashboard | null>(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    setError("");
+    get<FinanceDashboard>(`/api/billing/dashboard/?start=${start}&end=${end}`).then(setData).catch((err) => setError(errorText(err)));
+  }, [start, end]);
+  const presets: { label: TKey; start: () => string }[] = [
+    { label: "fin.thisMonth", start: () => isoToday().slice(0, 8) + "01" },
+    { label: "rep.last30", start: () => addDays(isoToday(), -29) },
+    { label: "rep.last90", start: () => addDays(isoToday(), -89) },
+    { label: "rep.lastYear", start: () => addDays(isoToday(), -364) },
+  ];
+  const fmtMoney = (n: number) => money(n, lang);
+  const period = (iso: string) => {
+    const d = new Date(`${iso}T12:00:00`);
+    const loc = lang === "ar" ? "ar-EG" : "en-GB";
+    return data?.bucket === "month" ? d.toLocaleDateString(loc, { month: "short", year: "2-digit" }) : d.toLocaleDateString(loc, { day: "numeric", month: "short" });
+  };
+  const download = async () => {
+    if (!ref.current) return;
+    setBusy(true);
+    try {
+      await exportPdf(ref.current, `finance-report-${start}-${end}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const changeNote = (cur: string, prev: string) => {
+    const d = delta(cur, prev);
+    return d === null ? t("fin.noPrev") : t(d >= 0 ? "fin.up" : "fin.down", { n: Math.abs(d) });
+  };
+  const agingRows = data
+    ? (["0_30", "31_60", "61_90", "90_plus"] as const).map((k) => ({ key: k, label: t(`fin.age.${k}` as TKey), value: Number(data.aging[k]) }))
+    : [];
+  return (
+    <>
+      <section className="card pad dash-bar">
+        <div className="toolbar">
+          <label className="field inline">
+            <span>{t("com.from")}</span>
+            <input type="date" value={start} max={end} onChange={(e) => setStart(e.target.value)} />
+          </label>
+          <label className="field inline">
+            <span>{t("com.to")}</span>
+            <input type="date" value={end} min={start} onChange={(e) => setEnd(e.target.value)} />
+          </label>
+          <div className="chip-row">
+            {presets.map((p) => (
+              <button key={p.label} className="chip" onClick={() => { setStart(p.start()); setEnd(isoToday()); }}>{t(p.label)}</button>
+            ))}
+          </div>
+        </div>
+        <button className="btn export-btn" disabled={busy || !data} onClick={() => void download()}>
+          <Icon name="download" size={18} /> {busy ? t("rep.exporting") : t("rep.exportPdf")}
+        </button>
+      </section>
+      {error && <p className="form-error" role="alert">{error}</p>}
+      {data && (
+        <div ref={ref} className="page report-body">
+          <header className="report-head pdf-only">
+            <div>
+              <h1>{t("fin.reportTitle")}</h1>
+              <p>{letterhead.name} · {fmtDate(data.start, lang)} – {fmtDate(data.end, lang)}</p>
+            </div>
+            <img src="/brand/logo.svg" alt="" />
+          </header>
+          <div className="kpi-grid">
+            <KpiTile i={0} label={t("fin.collected")} value={`${money(data.collected, lang)} ${currency}`} sub={changeNote(data.collected, data.collected_prev)} tone="good" />
+            <KpiTile i={1} label={t("fin.billed")} value={`${money(data.billed, lang)} ${currency}`} sub={changeNote(data.billed, data.billed_prev)} />
+            <KpiTile i={2} label={t("fin.rate")} value={data.collection_rate === null ? "—" : `${data.collection_rate}%`} sub={t("fin.rateSub")} tone={data.collection_rate !== null && data.collection_rate < 60 ? "warn" : undefined} />
+            <KpiTile i={3} label={t("fin.avgInvoice")} value={`${money(data.average_invoice, lang)} ${currency}`} sub={t("fin.invoicesN", { n: data.invoice_count })} />
+            <KpiTile i={4} label={t("fin.discounts")} value={`${money(data.discounts, lang)} ${currency}`} sub={t("fin.paymentsN", { n: data.payment_count })} />
+            <KpiTile i={5} label={t("fin.outstanding")} value={`${money(data.now.outstanding, lang)} ${currency}`} sub={t("fin.overdueSub", { n: money(data.now.overdue_installments, lang) })} tone="accent" />
+          </div>
+          <div className="dash-grid">
+            <section className="card dash-card wide">
+              <h2>{t("fin.chart.trend")}</h2>
+              <ColumnChart
+                points={data.trend.map((r) => ({ label: period(r.period), values: [Number(r.billed), Number(r.collected)] }))}
+                series={[t("fin.billed"), t("fin.collected")]}
+                format={fmtMoney}
+              />
+            </section>
+            <section className="card dash-card">
+              <h2>{t("fin.chart.methods")}</h2>
+              <BarList
+                rows={data.by_method.map((r) => ({ key: r.method, label: t(`pay.${r.method}` as TKey), value: Number(r.total), note: t("fin.paymentsN", { n: r.count }) }))}
+                format={fmtMoney}
+                empty={t("bill.noPayments")}
+              />
+            </section>
+            <section className="card dash-card">
+              <h2>{t("fin.chart.aging")}</h2>
+              <BarList rows={agingRows.filter((r) => r.value > 0)} format={fmtMoney} empty={t("fin.nothingOwed")} />
+            </section>
+            <section className="card dash-card">
+              <h2>{t("fin.chart.dentists")}</h2>
+              {data.by_dentist.length === 0 ? (
+                <p className="muted small">{t("noRecords")}</p>
+              ) : (
+                <div className="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{t("ap.dentist")}</th>
+                        <th className="num">{t("fin.billed")}</th>
+                        <th className="num">{t("fin.collected")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.by_dentist.map((r) => (
+                        <tr key={r.id}>
+                          <td>{personName(r.name, lang)}</td>
+                          <td className="num">{money(r.billed, lang)}</td>
+                          <td className="num">{money(r.collected, lang)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+            <section className="card dash-card">
+              <h2>{t("fin.chart.procedures")}</h2>
+              <BarList
+                rows={data.by_procedure.map((r, i) => ({ key: `${r.code}-${i}`, label: personName(r.name, lang), value: Number(r.billed), note: t("fin.timesN", { n: r.count }) }))}
+                format={fmtMoney}
+                empty={t("noRecords")}
+              />
+            </section>
+            <section className="card dash-card">
+              <h2>{t("fin.chart.debtors")}</h2>
+              {data.top_debtors.length === 0 ? (
+                <p className="muted small">{t("fin.nothingOwed")}</p>
+              ) : (
+                <ul className="mini-list">
+                  {data.top_debtors.map((r) => (
+                    <li key={r.id}>
+                      <Link to={`/patients/${r.id}`}>{personName(r, lang)}</Link>
+                      <span className="muted small mono">{r.file_number}</span>
+                      <span className="num strong owed">{money(r.balance, lang)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            <section className="card dash-card">
+              <h2>{t("fin.chart.installments")}</h2>
+              {data.installments_due.length === 0 ? (
+                <p className="muted small">{t("fin.noInstallments")}</p>
+              ) : (
+                <ul className="mini-list">
+                  {data.installments_due.map((r) => (
+                    <li key={r.id}>
+                      <Link to={`/patients/${r.patient.id}`}>{personName(r.patient, lang)}</Link>
+                      <span className={`small ${r.overdue ? "owed strong" : "muted"}`}>{fmtDate(r.due_date, lang)}</span>
+                      <span className="num strong">{money(r.remaining, lang)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

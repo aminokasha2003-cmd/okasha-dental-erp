@@ -533,3 +533,27 @@ export interface LabCostReport {
   remake_rate: number;
   on_time: number | null;
 }
+
+export interface FinanceDashboard {
+  start: string;
+  end: string;
+  bucket: "day" | "week" | "month";
+  now: { today: string; month: string; outstanding: string; overdue_installments: string; overdue_count: number };
+  billed: string;
+  collected: string;
+  billed_prev: string;
+  collected_prev: string;
+  invoice_count: number;
+  payment_count: number;
+  average_invoice: string;
+  discounts: string;
+  collection_rate: number | null;
+  trend: { period: string; billed: string; collected: string }[];
+  by_method: { method: string; total: string; count: number }[];
+  by_dentist: { id: number; name: { ar: string; en: string }; billed: string; collected: string }[];
+  by_procedure: { code: string; name: { ar: string; en: string }; count: number; billed: string }[];
+  aging: { "0_30": string; "31_60": string; "61_90": string; "90_plus": string };
+  top_debtors: { id: number; ar: string; en: string; file_number: string; balance: string; oldest: string }[];
+  installments_due: { id: number; invoice: number; invoice_number: string; due_date: string; remaining: string; overdue: boolean; patient: { id: number; ar: string; en: string; file_number: string } }[];
+  installments_upcoming_total: string;
+}
