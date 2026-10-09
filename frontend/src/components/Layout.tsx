@@ -22,6 +22,7 @@ const WORK: NavItem[] = [
   { to: "/clinical", label: "nav.clinical", icon: "tooth", module: "clinical" },
   { to: "/billing", label: "nav.billing", icon: "receipt", module: "billing" },
   { to: "/lab", label: "nav.lab", icon: "flask", module: "lab" },
+  { to: "/inventory", label: "nav.inventory", icon: "box", module: "inventory" },
 ];
 
 const SETUP: NavItem[] = [
@@ -33,12 +34,11 @@ const SETUP: NavItem[] = [
 ];
 
 const LATER: NavItem[] = [
-  { to: "/inventory", label: "nav.inventory", icon: "box" },
   { to: "/payroll", label: "nav.payroll", icon: "badge" },
   { to: "/crm", label: "nav.crm", icon: "chart" },
 ];
 
-/** Small counts on the sidebar: patients waiting, notes to sign, lab work needing this user. */
+/** Small counts on the sidebar: patients waiting, notes to sign, lab work needing this user, stock to act on. */
 function useBadges() {
   const { can } = useAuth();
   const [badges, setBadges] = useState<Record<string, number>>({});
@@ -51,6 +51,10 @@ function useBadges() {
       if (can("lab"))
         get<{ attention: number }>("/api/lab/summary/")
           .then((s) => setBadges((b) => ({ ...b, "/lab": s.attention })))
+          .catch(() => undefined);
+      if (can("inventory"))
+        get<{ low_stock: number; expired_with_stock: number }>("/api/inventory/summary/")
+          .then((s) => setBadges((b) => ({ ...b, "/inventory": s.low_stock + s.expired_with_stock })))
           .catch(() => undefined);
       if (can("clinical", "approve"))
         get<unknown[]>("/api/clinical/visit-notes/?unsigned=1")

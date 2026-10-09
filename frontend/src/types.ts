@@ -484,3 +484,200 @@ export interface LabCostReport {
   remake_rate: number;
   on_time: number | null;
 }
+
+/* ---------------------------------------------------------- inventory (phase 5) */
+
+export type ItemCategory = "consumable" | "material" | "implant" | "instrument" | "medicine" | "lab_material" | "office" | "other";
+export type MovementKind = "receive" | "use" | "adjust" | "transfer_out" | "transfer_in" | "return_to_supplier" | "waste";
+export type POStatus = "draft" | "ordered" | "partially_received" | "received" | "cancelled";
+
+export interface NamedRef {
+  id: number;
+  en: string;
+  ar: string;
+}
+
+export interface ItemInfo {
+  id: number;
+  code: string;
+  en: string;
+  ar: string;
+  category: ItemCategory;
+  unit: string;
+  tracks_lots: boolean;
+}
+
+export interface Supplier {
+  id: number;
+  name: string;
+  contact_person: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  address: string;
+  payment_terms: string;
+  notes: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface StockItem {
+  id: number;
+  code: string;
+  name_en: string;
+  name_ar: string;
+  category: ItemCategory;
+  category_label: string;
+  unit: string;
+  unit_label: string;
+  units_per_pack: number;
+  preferred_supplier: number | null;
+  preferred_supplier_name: string | null;
+  last_cost: string;
+  reorder_level: string;
+  reorder_quantity: string;
+  tracks_lots: boolean;
+  is_active: boolean;
+  notes: string;
+  brand: string;
+  system: string;
+  diameter: string | null;
+  length: string | null;
+  on_hand: string;
+  stock_value: string;
+  is_low: boolean;
+  next_expiry: string | null;
+  stock: { branch: NamedRef; quantity: string }[];
+  created_at: string;
+}
+
+export interface StockLot {
+  id: number;
+  item: number;
+  item_info: ItemInfo;
+  branch: number;
+  branch_name: NamedRef;
+  lot_number: string;
+  expiry_date: string | null;
+  days_to_expiry: number | null;
+  quantity: string;
+  unit_cost: string;
+  value: string;
+  received_at: string | null;
+  supplier: number | null;
+  supplier_name: string | null;
+  purchase_order: string | null;
+}
+
+export interface StockMovement {
+  id: number;
+  created_at: string;
+  kind: MovementKind;
+  kind_label: string;
+  item: number;
+  item_info: ItemInfo;
+  lot: number;
+  lot_number: string;
+  expiry_date: string | null;
+  branch: number;
+  branch_name: NamedRef;
+  other_branch: number | null;
+  other_branch_name: NamedRef | null;
+  quantity: string;
+  balance_after: string;
+  unit_cost: string;
+  value: string;
+  note: string;
+  plan_line: number | null;
+  appointment: number | null;
+  lab_case: number | null;
+  lab_case_number: string | null;
+  purchase_order_line: number | null;
+  purchase_order: string | null;
+  patient: number | null;
+  patient_info: { id: number; en: string; ar: string; file_number: string } | null;
+  by: string;
+}
+
+export interface ProcedureMaterial {
+  id: number;
+  procedure: number;
+  procedure_name: { en: string; ar: string; code: string };
+  item: number;
+  item_info: ItemInfo;
+  quantity: string;
+}
+
+export interface PurchaseOrderLine {
+  id: number;
+  item: number;
+  item_info: ItemInfo;
+  quantity_ordered: string;
+  unit_cost: string;
+  quantity_received: string;
+  remaining: string;
+  total: string;
+}
+
+export interface PurchaseOrder {
+  id: number;
+  number: string;
+  supplier: number;
+  supplier_name: string;
+  branch: number;
+  branch_name: NamedRef;
+  status: POStatus;
+  status_label: string;
+  expected_date: string | null;
+  notes: string;
+  lines: PurchaseOrderLine[];
+  total: string;
+  received_value: string;
+  ordered_at: string | null;
+  received_at: string | null;
+  cancelled_at: string | null;
+  cancel_reason: string;
+  created_at: string;
+}
+
+export interface SuggestResult {
+  orders: PurchaseOrder[];
+  no_supplier: (ItemInfo & { on_hand: string; suggested: string })[];
+}
+
+export interface InventorySummary {
+  items: number;
+  low_stock: number;
+  out_of_stock: number;
+  expiring_30: number;
+  expiring_60: number;
+  expiring_90: number;
+  expired_with_stock: number;
+  stock_value: string;
+  open_orders: number;
+  draft_orders: number;
+  consumed_this_month: string;
+}
+
+export interface ImplantTraceRow {
+  id: number;
+  used_at: string;
+  patient: { id: number; en: string; ar: string; file_number: string } | null;
+  item: ItemInfo & { brand: string; system: string; diameter: string | null; length: string | null };
+  lot: number;
+  lot_number: string;
+  expiry_date: string | null;
+  quantity: string;
+  branch: NamedRef;
+  plan_line: number | null;
+  procedure: { en: string; ar: string; code: string } | null;
+  tooth: string | number | null;
+  dentist: NamedRef | null;
+  lab_case: string | null;
+}
+
+export interface ImplantTrace {
+  results: ImplantTraceRow[];
+  count: number;
+  patients: number;
+}

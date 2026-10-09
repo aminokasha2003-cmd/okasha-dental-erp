@@ -7,6 +7,7 @@ import { Audit } from "./pages/Audit";
 import { NoAccess } from "./pages/ComingSoon";
 import { Billing } from "./pages/Billing";
 import { Lab } from "./pages/Lab";
+import { Inventory } from "./pages/Inventory";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Appointments } from "./pages/Appointments";
@@ -43,6 +44,7 @@ export function App() {
         <Route path="clinical" element={<Guard module="clinical"><Clinical /></Guard>} />
         <Route path="billing" element={<Guard module="billing"><Billing /></Guard>} />
         <Route path="lab" element={<Guard module="lab"><Lab /></Guard>} />
+        <Route path="inventory" element={<Guard module="inventory"><Inventory /></Guard>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
