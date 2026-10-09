@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "erp.appointments",
     "erp.clinical",
     "erp.billing",
+    "erp.lab",
 ]
 
 MIDDLEWARE = [

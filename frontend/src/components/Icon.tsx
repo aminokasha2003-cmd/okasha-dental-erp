@@ -26,6 +26,8 @@ const PATHS = {
   collapse: "M15 6l-6 6 6 6M20 4v16",
   logout: "M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11",
   wallet: "M3 7a2 2 0 0 1 2-2h13v4M3 7v10a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2zM16 14h.01",
+  arrow: "M5 12h14M13 6l6 6-6 6",
+  upload: "M12 16V4M7 9l5-5 5 5M4 20h16",
   cash: "M3 6h18v12H3zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 9v.01M18 15v.01",
 } as const;
 

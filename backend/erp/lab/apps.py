@@ -1,0 +1,8 @@
+from django.apps import AppConfig
+
+
+class LabConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "erp.lab"
+    label = "lab"
+    verbose_name = "Lab"

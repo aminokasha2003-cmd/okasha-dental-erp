@@ -388,3 +388,99 @@ export interface CommissionRow {
   commission: string;
 }
 export interface PatientAccount { billed: string; paid: string; balance: string; on_account: string }
+
+// ---- Lab (phase 4) ----
+
+export type LabStage = "received" | "design" | "milling" | "finishing" | "ready" | "delivered";
+
+export interface LabEvent {
+  id: number;
+  stage: LabStage;
+  note: string;
+  created_at: string;
+  by: string;
+}
+
+export interface LabCase {
+  id: number;
+  number: string;
+  patient: number;
+  patient_info: { id: number; ar: string; en: string; file_number: string };
+  plan_line: number;
+  procedure: { en: string; ar: string; tooth: number | null; status: string };
+  dentist: number;
+  dentist_name: { id: number; ar: string; en: string };
+  technician: number | null;
+  technician_name: { id: number; ar: string; en: string } | null;
+  restoration: string;
+  material: string;
+  shade: string;
+  teeth: string;
+  units: number;
+  instructions: string;
+  due_date: string;
+  appointment: number | null;
+  appointment_start: string | null;
+  stage: LabStage;
+  events: LabEvent[];
+  is_open: boolean;
+  overdue: boolean;
+  delivered_at: string | null;
+  cancelled_at: string | null;
+  cancel_reason: string;
+  remake_of: number | null;
+  remake_of_number: string | null;
+  remake_numbers: string[];
+  remake_reason: string;
+  remake_note: string;
+  remake_charged_to: string;
+  material_cost: string;
+  labour_cost: string;
+  cost_total: string;
+  cost_per_unit: string;
+  created_at: string;
+}
+
+export interface OrderableLine {
+  id: number;
+  procedure_name_en: string;
+  procedure_name_ar: string;
+  needs_lab: boolean;
+  tooth: number | null;
+  status: string;
+  dentist: number;
+  appointment: number | null;
+  appointment_start: string | null;
+  has_open_case: boolean;
+  restoration: string;
+  material: string;
+}
+
+export interface LabSummary {
+  by_stage: Record<string, number>;
+  open: number;
+  overdue: number;
+  due_today: number;
+  unassigned: number;
+  mine: number;
+  attention: number;
+}
+
+export interface LabCostRow {
+  restoration: string;
+  material: string;
+  cases: number;
+  units: number;
+  cost: string;
+  cost_per_unit: string;
+  remakes: number;
+  scrap_cost: string;
+}
+
+export interface LabCostReport {
+  rows: LabCostRow[];
+  delivered: number;
+  remakes: number;
+  remake_rate: number;
+  on_time: number | null;
+}
