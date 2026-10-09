@@ -103,6 +103,7 @@ The look follows the approved Okasha design in `docs/design/` (colours, fonts, l
 - **Patient file.** A hero header with an animated avatar ring, a sticky section bar that follows the scroll, and cards that rise in as you reach them.
 - **Lab orders.** "New lab order" on the lab page takes a direct order or work from a treatment plan through four steps: work, shade and design (shade guide, stump, cervical and incisal shades, margin, contacts, occlusion, pontic, implant system and abutment), what is sent with the case, and timing. Cases can be marked rush or put on hold with a reason, and there is a quality check stage before try-in.
 - **Dashboards with PDF reports.** The lab dashboard (volume, turnaround, on-time rate, remakes, technicians, cost by material) and the finance dashboard under Billing (billed vs collected, payment methods, money owed by age, top debtors, installments due, dentists, top procedures) take a date range and export to a PDF report with the clinic letterhead.
+- **Inventory and purchasing.** Stock per branch with lots and expiry dates, suppliers, purchase orders (draft, ordered, partly received, received) with a suggest button that drafts orders for everything at or below its reorder level, counts, waste and transfers between branches, materials used per procedure, and implant lot tracing (which patients got a given lot, and which lots a patient got). Costs show only to people allowed to approve or edit stock.
 
 ## Run it for development
 
