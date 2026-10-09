@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ApiError, api, del, get, getAll, openProtectedFile, patch, post } from "../api";
 import { useAuth } from "../auth";
@@ -71,6 +71,54 @@ function dentistLabel(a: Appointment, lang: string) {
   return lang === "ar" ? a.dentist_name_ar : a.dentist_name_en;
 }
 
+/** The section currently in view, for the section menu. */
+function useActiveSection(ids: string[]) {
+  const [active, setActive] = useState(ids[0]);
+  const key = ids.join(",");
+  useEffect(() => {
+    const seen = new Map<string, number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) seen.set(e.target.id, e.isIntersecting ? e.intersectionRatio : 0);
+        const best = ids.find((id) => (seen.get(id) ?? 0) > 0);
+        if (best) setActive(best);
+      },
+      { rootMargin: "-140px 0px -55% 0px", threshold: [0, 0.01, 0.2] },
+    );
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return active;
+}
+
+/** Cards rise into place the first time they scroll into view. */
+function useReveal(ready: boolean) {
+  useEffect(() => {
+    if (!ready) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries)
+          if (e.isIntersecting) {
+            e.target.classList.add("is-in");
+            observer.unobserve(e.target);
+          }
+      },
+      { rootMargin: "0px 0px -8% 0px" },
+    );
+    const watch = () => document.querySelectorAll(".patient-file .card:not(.is-in)").forEach((el) => observer.observe(el));
+    watch();
+    const later = window.setTimeout(watch, 1200);
+    return () => {
+      window.clearTimeout(later);
+      observer.disconnect();
+    };
+  }, [ready]);
+}
+
 export function PatientProfile() {
   const { id } = useParams();
   const { t, lang } = useI18n();
@@ -102,6 +150,7 @@ export function PatientProfile() {
   }, [id, can]);
   useEffect(load, [load]);
   useEffect(loadVisits, [loadVisits]);
+  useReveal(Boolean(patient));
 
   if (error) return <p className="form-error pad">{error}</p>;
   if (!patient) return <p className="muted pad">{t("loading")}</p>;
@@ -142,6 +191,7 @@ export function PatientProfile() {
     { id: "notes", label: "pt.staffNotes", show: true },
   ];
 
+  const shown = sections.filter((s) => s.show);
   return (
     <div className="page patient-file">
       <nav className="breadcrumb" aria-label="Breadcrumb">
@@ -150,9 +200,9 @@ export function PatientProfile() {
         <span>{patientName(patient, lang)}</span>
       </nav>
 
-      <section className="card pf-summary">
+      <section className="card pf-summary is-in">
         <div className="pf-head">
-          <div className="pf-avatar" aria-hidden="true">{initials(patient)}</div>
+          <div className="pf-avatar" aria-hidden="true"><span>{initials(patient)}</span></div>
           <div className="pf-identity">
             <h1 className="pf-name">
               {patientName(patient, lang)}
@@ -228,18 +278,7 @@ export function PatientProfile() {
         </div>
       </section>
 
-      <nav className="card section-nav" aria-label={t("pt.details")}>
-        {sections
-          .filter((s) => s.show)
-          .map((s) => (
-            <a key={s.id} href={`#${s.id}`} onClick={(e) => {
-              e.preventDefault();
-              document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-            }}>
-              {t(s.label)}
-            </a>
-          ))}
-      </nav>
+      <SectionNav sections={shown} />
 
       {clinicalOn && (
         <ChartCard
@@ -294,6 +333,30 @@ export function PatientProfile() {
         />
       )}
     </div>
+  );
+}
+
+function SectionNav({ sections }: { sections: { id: string; label: TKey }[] }) {
+  const { t } = useI18n();
+  const active = useActiveSection(sections.map((s) => s.id));
+  return (
+    <nav className="card section-nav is-in" aria-label={t("pt.details")}>
+      {sections.map((s, i) => (
+        <a
+          key={s.id}
+          href={`#${s.id}`}
+          className={active === s.id ? "active" : ""}
+          aria-current={active === s.id ? "location" : undefined}
+          style={{ "--i": i } as CSSProperties}
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+        >
+          {t(s.label)}
+        </a>
+      ))}
+    </nav>
   );
 }
 

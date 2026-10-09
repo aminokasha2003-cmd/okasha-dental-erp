@@ -32,8 +32,9 @@ class LabCase(ClinicScopedModel):
     STAGES = [
         ("received", _("Scan received")),
         ("design", _("CAD design")),
-        ("milling", _("Milling")),
+        ("milling", _("Milling and printing")),
         ("finishing", _("Sintering and glaze")),
+        ("qc", _("Quality check")),
         ("ready", _("Ready for try-in")),
         ("delivered", _("Delivered")),
     ]
@@ -70,10 +71,50 @@ class LabCase(ClinicScopedModel):
         ("other", _("Other")),
     ]
     CHARGED_TO = [("lab", _("Lab")), ("clinic", _("Clinic"))]
+    PRIORITIES = [("normal", _("Normal")), ("rush", _("Rush"))]
+    SHADE_GUIDES = [("vita_classic", _("VITA Classical")), ("vita_3d", _("VITA 3D-Master")), ("other", _("Other"))]
+    MARGINS = [
+        ("chamfer", _("Chamfer")),
+        ("shoulder", _("Shoulder")),
+        ("knife_edge", _("Knife edge")),
+        ("porcelain_butt", _("Porcelain butt margin")),
+        ("metal_collar", _("Metal collar")),
+    ]
+    CONTACTS = [("light", _("Light")), ("normal", _("Normal")), ("tight", _("Tight"))]
+    OCCLUSION = [("in", _("In occlusion")), ("light", _("Light occlusion")), ("out", _("Out of occlusion"))]
+    PONTICS = [
+        ("ridge_lap", _("Ridge lap")),
+        ("modified_ridge_lap", _("Modified ridge lap")),
+        ("ovate", _("Ovate")),
+        ("sanitary", _("Sanitary (hygienic)")),
+    ]
+    ABUTMENTS = [
+        ("stock", _("Stock abutment")),
+        ("custom_ti", _("Custom titanium")),
+        ("zirconia", _("Zirconia")),
+        ("ti_base", _("Ti-base hybrid")),
+    ]
+    RETENTION = [("screw", _("Screw retained")), ("cement", _("Cement retained"))]
+    # What came in with the order, checked off on arrival.
+    ENCLOSURES = [
+        ("scan", _("Digital scan")),
+        ("impression_upper", _("Upper impression")),
+        ("impression_lower", _("Lower impression")),
+        ("bite", _("Bite registration")),
+        ("models", _("Models")),
+        ("photos", _("Shade photos")),
+        ("implant_parts", _("Implant parts or analogs")),
+        ("old_denture", _("Old denture")),
+        ("custom_tray", _("Custom tray")),
+        ("shade_tab", _("Shade tab")),
+    ]
 
     number = models.CharField(_("number"), max_length=20, editable=False)
     patient = models.ForeignKey("patients.Patient", on_delete=models.PROTECT, related_name="lab_cases")
-    plan_line = models.ForeignKey("clinical.TreatmentPlanLine", on_delete=models.PROTECT, related_name="lab_cases")
+    # Usually ordered from a plan line; a direct order from the lab page may have none.
+    plan_line = models.ForeignKey(
+        "clinical.TreatmentPlanLine", null=True, blank=True, on_delete=models.PROTECT, related_name="lab_cases"
+    )
     dentist = models.ForeignKey("masterdata.StaffMember", on_delete=models.PROTECT, related_name="ordered_lab_cases")
     technician = models.ForeignKey(
         "masterdata.StaffMember", null=True, blank=True, on_delete=models.PROTECT, related_name="lab_cases"
@@ -97,6 +138,25 @@ class LabCase(ClinicScopedModel):
     remake_reason = models.CharField(_("remake reason"), max_length=20, choices=REMAKE_REASONS, blank=True)
     remake_note = models.CharField(_("remake note"), max_length=255, blank=True)
     remake_charged_to = models.CharField(_("remake cost carried by"), max_length=10, choices=CHARGED_TO, blank=True)
+    priority = models.CharField(_("priority"), max_length=10, choices=PRIORITIES, default="normal")
+    pan_number = models.CharField(_("pan number"), max_length=20, blank=True)
+    on_hold = models.BooleanField(_("on hold"), default=False)
+    hold_reason = models.CharField(_("hold reason"), max_length=255, blank=True)
+    shade_guide = models.CharField(_("shade guide"), max_length=20, choices=SHADE_GUIDES, default="vita_classic")
+    stump_shade = models.CharField(_("stump shade"), max_length=20, blank=True)
+    cervical_shade = models.CharField(_("cervical shade"), max_length=20, blank=True)
+    incisal_shade = models.CharField(_("incisal shade"), max_length=20, blank=True)
+    margin = models.CharField(_("margin"), max_length=20, choices=MARGINS, blank=True)
+    contacts = models.CharField(_("contacts"), max_length=10, choices=CONTACTS, blank=True)
+    occlusion = models.CharField(_("occlusion"), max_length=10, choices=OCCLUSION, blank=True)
+    pontic = models.CharField(_("pontic design"), max_length=20, choices=PONTICS, blank=True)
+    implant_system = models.CharField(_("implant system"), max_length=100, blank=True)
+    implant_platform = models.CharField(_("implant platform"), max_length=50, blank=True)
+    abutment = models.CharField(_("abutment"), max_length=20, choices=ABUTMENTS, blank=True)
+    retention = models.CharField(_("retention"), max_length=10, choices=RETENTION, blank=True)
+    enclosures = models.JSONField(_("received with the order"), default=list, blank=True)
+    outsourced_to = models.CharField(_("sent to outside lab"), max_length=150, blank=True)
+    outsource_tracking = models.CharField(_("outside lab reference"), max_length=100, blank=True)
     material_cost = models.DecimalField(_("material cost"), max_digits=10, decimal_places=2, default=0)
     labour_cost = models.DecimalField(_("labour cost"), max_digits=10, decimal_places=2, default=0)
 

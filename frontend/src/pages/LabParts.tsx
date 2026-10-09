@@ -13,8 +13,16 @@ import { errorText, personName } from "./BillingParts";
 // Lab cases (phase 4). Stages follow the patient card design: scan received,
 // CAD design, milling, sintering and glaze, ready for try-in, then delivered.
 
-export const STAGES: LabStage[] = ["received", "design", "milling", "finishing", "ready", "delivered"];
-export const OPEN_STAGES: LabStage[] = ["received", "design", "milling", "finishing", "ready"];
+export const STAGES: LabStage[] = ["received", "design", "milling", "finishing", "qc", "ready", "delivered"];
+export const OPEN_STAGES: LabStage[] = ["received", "design", "milling", "finishing", "qc", "ready"];
+export const SHADE_GUIDES = ["vita_classic", "vita_3d", "other"];
+export const MARGINS = ["chamfer", "shoulder", "knife_edge", "porcelain_butt", "metal_collar"];
+export const CONTACTS = ["light", "normal", "tight"];
+export const OCCLUSION = ["in", "light", "out"];
+export const PONTICS = ["ridge_lap", "modified_ridge_lap", "ovate", "sanitary"];
+export const ABUTMENTS = ["stock", "custom_ti", "zirconia", "ti_base"];
+export const RETENTION = ["screw", "cement"];
+export const ENCLOSURES = ["scan", "impression_upper", "impression_lower", "bite", "models", "photos", "implant_parts", "old_denture", "custom_tray", "shade_tab"];
 export const RESTORATIONS = ["crown", "bridge", "veneer", "inlay_onlay", "implant_crown", "post_core", "denture_full", "denture_partial", "night_guard", "temporary", "other"];
 export const MATERIALS = ["zirconia", "emax", "pfm", "metal", "pmma", "composite", "acrylic", "other"];
 const REMAKE_REASONS = ["fit", "shade", "fracture", "design", "patient", "other"];
@@ -40,7 +48,7 @@ export function useCaseTitle() {
       const restoration = t(`lab.rest.${c.restoration}` as TKey);
       const material = c.material === "other" ? "" : t(`lab.mat.${c.material}` as TKey);
       const what = material ? t("lab.what", { material, restoration: lang === "en" ? restoration.toLowerCase() : restoration }) : restoration;
-      const where = c.teeth ? t("lab.teeth", { n: c.teeth }) : c.procedure.tooth ? t("lab.tooth", { n: c.procedure.tooth }) : "";
+      const where = c.teeth ? t(/[,،\s-]/.test(c.teeth.trim()) ? "lab.teeth" : "lab.tooth", { n: c.teeth.trim() }) : c.procedure?.tooth ? t("lab.tooth", { n: c.procedure.tooth }) : "";
       return where ? `${what}${lang === "ar" ? "، " : ", "}${where}` : what;
     },
     [t, lang],
@@ -108,7 +116,18 @@ function usePrintCase() {
         ${row(t("lab.number"), c.number)}
         ${row(t("lab.restoration"), t(`lab.rest.${c.restoration}` as TKey))}
         ${row(t("lab.material"), t(`lab.mat.${c.material}` as TKey))}
-        ${row(t("lab.shade"), c.shade)}
+        ${row(t("lab.pan"), c.pan_number)}
+        ${row(t("lab.priority"), c.priority === "rush" ? t("lab.priority.rush") : "")}
+        ${row(t("lab.shade"), [c.shade, c.shade_guide ? t(`lab.guide.${c.shade_guide}` as TKey) : ""].filter(Boolean).join(" · "))}
+        ${row(t("lab.stumpShade"), c.stump_shade)}
+        ${row(t("lab.layers"), [c.cervical_shade, c.incisal_shade].filter(Boolean).join(" / "))}
+        ${row(t("lab.margin"), c.margin ? t(`lab.margins.${c.margin}` as TKey) : "")}
+        ${row(t("lab.contacts"), c.contacts ? t(`lab.contact.${c.contacts}` as TKey) : "")}
+        ${row(t("lab.occlusion"), c.occlusion ? t(`lab.occl.${c.occlusion}` as TKey) : "")}
+        ${row(t("lab.pontic"), c.pontic ? t(`lab.pontics.${c.pontic}` as TKey) : "")}
+        ${row(t("lab.implantSystem"), [c.implant_system, c.implant_platform].filter(Boolean).join(" · "))}
+        ${row(t("lab.abutment"), c.abutment ? `${t(`lab.abut.${c.abutment}` as TKey)}${c.retention ? ` · ${t(`lab.ret.${c.retention}` as TKey)}` : ""}` : "")}
+        ${row(t("lab.enclosures"), c.enclosures.map((x) => t(`lab.encl.${x}` as TKey)).join(", "))}
         ${row(t("lab.units"), String(c.units))}
         ${row(t("lab.due"), fmtDate(c.due_date, lang))}
         ${row(t("lab.tryIn"), c.appointment_start ? new Date(c.appointment_start).toLocaleString(locale(lang), { dateStyle: "medium", timeStyle: "short" }) : "")}
@@ -123,32 +142,108 @@ function usePrintCase() {
 
 /* ---------------------------------------------------------- new case */
 
-export function NewCaseDialog({ patientId, onClose, onSaved }: { patientId: number; onClose: () => void; onSaved: (c: LabCase) => void }) {
+type PatientInfo = { id: number; ar: string; en: string; file_number: string };
+
+const EMPTY_FORM = {
+  restoration: "crown",
+  material: "zirconia",
+  shade: "",
+  shade_guide: "vita_classic",
+  stump_shade: "",
+  cervical_shade: "",
+  incisal_shade: "",
+  teeth: "",
+  units: 1,
+  due_date: addDays(isoToday(), 5),
+  technician: "",
+  dentist: "",
+  appointment: "",
+  instructions: "",
+  priority: "normal",
+  pan_number: "",
+  margin: "",
+  contacts: "",
+  occlusion: "",
+  pontic: "",
+  implant_system: "",
+  implant_platform: "",
+  abutment: "",
+  retention: "",
+  enclosures: ["scan"] as string[],
+  outsourced_to: "",
+};
+
+/** Pick a patient from the lab page: names and file numbers only, so lab staff can use it too. */
+function LabPatientPicker({ onPick }: { onPick: (p: PatientInfo) => void }) {
   const { t, lang } = useI18n();
-  const { can } = useAuth();
+  const [search, setSearch] = useState("");
+  const [rows, setRows] = useState<PatientInfo[]>([]);
+  useEffect(() => {
+    if (search.trim().length < 2) return setRows([]);
+    const timer = window.setTimeout(() => {
+      get<PatientInfo[]>(`/api/lab/cases/patients/?search=${encodeURIComponent(search.trim())}`).then(setRows).catch(() => setRows([]));
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+  return (
+    <div className="field">
+      <label htmlFor="lab-patient">{t("ap.patient")}</label>
+      <input id="lab-patient" type="search" autoFocus placeholder={t("lab.findPatient")} value={search} onChange={(e) => setSearch(e.target.value)} />
+      {rows.length > 0 && (
+        <ul className="picker-results">
+          {rows.map((p) => (
+            <li key={p.id}>
+              <button type="button" onClick={() => onPick(p)}>
+                <strong>{personName(p, lang)}</strong> <span className="muted num">{p.file_number}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/** A lab order (prescription) in four steps: what, shade and design, implant and enclosures, timing. */
+export function NewCaseDialog({ patientId, onClose, onSaved }: { patientId?: number; onClose: () => void; onSaved: (c: LabCase) => void }) {
+  const { t, lang } = useI18n();
+  const { can, me } = useAuth();
   const technicians = useTechnicians();
+  const [patient, setPatient] = useState<PatientInfo | null>(null);
+  const pid = patientId ?? patient?.id ?? null;
   const [lines, setLines] = useState<OrderableLine[] | null>(null);
   const [visits, setVisits] = useState<Appointment[]>([]);
   const [lineId, setLineId] = useState<number | null>(null);
-  const [form, setForm] = useState({ restoration: "crown", material: "zirconia", shade: "", teeth: "", units: 1, due_date: addDays(isoToday(), 5), technician: "", appointment: "", instructions: "" });
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [step, setStep] = useState(0);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const set = (patch: Partial<typeof form>) => setForm((f) => ({ ...f, ...patch }));
+  const dentists = technicians.filter((s) => s.staff_type === "dentist");
 
   useEffect(() => {
-    get<OrderableLine[]>(`/api/lab/cases/orderable/?patient=${patientId}`)
+    if (!pid) return;
+    setLines(null);
+    setLineId(null);
+    get<OrderableLine[]>(`/api/lab/cases/orderable/?patient=${pid}`)
       .then((rows) => {
         setLines(rows);
-        const first = rows.find((r) => !r.has_open_case);
+        const first = rows.find((r) => !r.has_open_case && r.needs_lab) ?? rows.find((r) => !r.has_open_case);
         if (first) pick(first);
       })
       .catch(() => setLines([]));
     if (can("appointments"))
-      get<Appointment[]>(`/api/appointments/?patient=${patientId}`)
+      get<Appointment[]>(`/api/appointments/?patient=${pid}`)
         .then((rows) => setVisits(rows.filter((a) => ["booked", "confirmed"].includes(a.status) && new Date(a.start).getTime() > Date.now())))
         .catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientId]);
+  }, [pid]);
+  useEffect(() => {
+    // The signed-in dentist orders for themselves by default.
+    const mine = me?.staff_member?.staff_type === "dentist" ? dentists.find((d) => d.id === me.staff_member?.id) : undefined;
+    if (mine && !form.dentist) set({ dentist: String(mine.id) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dentists.length]);
 
   const pick = (line: OrderableLine) => {
     setLineId(line.id);
@@ -156,6 +251,7 @@ export function NewCaseDialog({ patientId, onClose, onSaved }: { patientId: numb
     set({
       restoration: line.restoration,
       material: line.material,
+      teeth: line.tooth ? String(line.tooth) : "",
       appointment: future && line.appointment ? String(line.appointment) : "",
       // Ready two days before the try-in visit when there is one.
       ...(future && line.appointment_start ? { due_date: addDays(new Date(line.appointment_start).toLocaleDateString("en-CA"), -2) } : {}),
@@ -164,19 +260,26 @@ export function NewCaseDialog({ patientId, onClose, onSaved }: { patientId: numb
 
   const visit = visits.find((v) => String(v.id) === form.appointment);
   const late = visit && form.due_date > new Date(visit.start).toLocaleDateString("en-CA");
+  const implant = form.restoration === "implant_crown";
+  const bridge = form.restoration === "bridge";
+  const canSend = Boolean(pid) && (lineId !== null || Boolean(form.dentist));
+  const steps: TKey[] = ["lab.step.work", "lab.step.shade", "lab.step.parts", "lab.step.timing"];
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!lineId) return;
+    if (step < steps.length - 1) return setStep(step + 1);
+    if (!canSend) return;
     setBusy(true);
     setError("");
     try {
+      const { technician, appointment, dentist, ...rest } = form;
       onSaved(
         await post<LabCase>("/api/lab/cases/", {
-          plan_line: lineId,
-          ...form,
-          technician: form.technician ? Number(form.technician) : null,
-          appointment: form.appointment ? Number(form.appointment) : null,
+          ...rest,
+          ...(lineId ? { plan_line: lineId } : { patient: pid }),
+          ...(dentist ? { dentist: Number(dentist) } : {}),
+          technician: technician ? Number(technician) : null,
+          appointment: appointment ? Number(appointment) : null,
         }),
       );
     } catch (err) {
@@ -186,89 +289,236 @@ export function NewCaseDialog({ patientId, onClose, onSaved }: { patientId: numb
     }
   };
 
+  const choice = (label: TKey, key: "margin" | "contacts" | "occlusion" | "pontic" | "abutment" | "retention" | "shade_guide", options: string[], prefix: string) => (
+    <fieldset className="field choice-field">
+      <legend>{t(label)}</legend>
+      <div className="choice-row">
+        {options.map((o) => (
+          <button key={o} type="button" className={`choice ${form[key] === o ? "active" : ""}`} aria-pressed={form[key] === o} onClick={() => set({ [key]: form[key] === o && key !== "shade_guide" ? "" : o })}>
+            {t(`${prefix}.${o}` as TKey)}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+
   return (
     <Modal title={t("lab.newOrder")} onClose={onClose}>
-      <form className="form-grid" onSubmit={submit}>
-        <fieldset className="field">
-          <legend>{t("lab.forLine")}</legend>
-          {lines === null ? (
-            <p className="muted">{t("loading")}</p>
-          ) : lines.length === 0 ? (
-            <p className="muted small">{t("lab.noLines")}</p>
-          ) : (
-            <div className="line-checks lab-lines">
-              {lines.map((l) => (
-                <label key={l.id} className={`check ${l.has_open_case ? "is-disabled" : ""}`}>
-                  <input type="radio" name="line" checked={lineId === l.id} disabled={l.has_open_case} onChange={() => pick(l)} />
-                  <span className="grow">
-                    {lang === "ar" ? l.procedure_name_ar || l.procedure_name_en : l.procedure_name_en || l.procedure_name_ar}
-                    {l.tooth ? ` · ${t("tooth.label", { n: l.tooth })}` : ""}
-                    <span className="muted small"> · {t(`line.status.${l.status}` as TKey)}</span>
-                  </span>
-                  {l.has_open_case ? <span className="pill pill-muted">{t("lab.inLab")}</span> : l.needs_lab ? <span className="pill pill-outline">{t("lab.labWork")}</span> : null}
-                </label>
-              ))}
+      <form className="form-grid rx-form" onSubmit={submit}>
+        {!patientId && (
+          patient ? (
+            <div className="picked">
+              <span className="muted">{t("ap.patient")}:</span> <strong>{personName(patient, lang)}</strong> <span className="muted mono">{patient.file_number}</span>
+              <button type="button" className="btn btn-small" onClick={() => { setPatient(null); setLines(null); setLineId(null); setStep(0); }}>{t("ap.change")}</button>
             </div>
-          )}
-        </fieldset>
-        <div className="form-grid form-grid-2">
-          <label className="field">
-            <span>{t("lab.restoration")}</span>
-            <select value={form.restoration} onChange={(e) => set({ restoration: e.target.value })}>
-              {RESTORATIONS.map((r) => <option key={r} value={r}>{t(`lab.rest.${r}` as TKey)}</option>)}
-            </select>
-          </label>
-          <label className="field">
-            <span>{t("lab.material")}</span>
-            <select value={form.material} onChange={(e) => set({ material: e.target.value })}>
-              {MATERIALS.map((m) => <option key={m} value={m}>{t(`lab.mat.${m}` as TKey)}</option>)}
-            </select>
-          </label>
-          <label className="field">
-            <span>{t("lab.shade")}</span>
-            <input list="lab-shades" dir="ltr" value={form.shade} placeholder="A2" onChange={(e) => set({ shade: e.target.value })} />
-            <datalist id="lab-shades">{SHADES.map((s) => <option key={s} value={s} />)}</datalist>
-          </label>
-          <label className="field">
-            <span>{t("lab.units")}</span>
-            <input type="number" min="1" max="32" value={form.units} onChange={(e) => set({ units: Math.max(1, Number(e.target.value) || 1) })} />
-          </label>
-          <label className="field">
-            <span>{t("lab.teethField")}</span>
-            <input dir="ltr" value={form.teeth} placeholder={t("lab.teethPh")} onChange={(e) => set({ teeth: e.target.value })} />
-          </label>
-          <label className="field">
-            <span>{t("lab.due")}</span>
-            <input type="date" required min={isoToday()} value={form.due_date} onChange={(e) => set({ due_date: e.target.value })} />
-          </label>
-          <label className="field">
-            <span>{t("lab.technician")}</span>
-            <select value={form.technician} onChange={(e) => set({ technician: e.target.value })}>
-              <option value="">{t("lab.unassigned")}</option>
-              {technicians.map((s) => <option key={s.id} value={s.id}>{personName({ ar: s.name_ar, en: s.name_en }, lang)}</option>)}
-            </select>
-          </label>
-          {visits.length > 0 && (
-            <label className="field">
-              <span>{t("lab.tryIn")}</span>
-              <select value={form.appointment} onChange={(e) => set({ appointment: e.target.value })}>
-                <option value="">{t("lab.noVisit")}</option>
-                {visits.map((v) => (
-                  <option key={v.id} value={v.id}>{new Date(v.start).toLocaleString(locale(lang), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</option>
-                ))}
-              </select>
-            </label>
-          )}
-        </div>
-        {late && <p className="pill pill-warn">{t("lab.lateWarning")}</p>}
-        <label className="field">
-          <span>{t("lab.instructions")}</span>
-          <textarea rows={3} value={form.instructions} placeholder={t("lab.instructionsPh")} onChange={(e) => set({ instructions: e.target.value })} />
-        </label>
+          ) : (
+            <LabPatientPicker onPick={setPatient} />
+          )
+        )}
+        {pid && (
+          <>
+            <ol className="rx-steps" aria-label={t("lab.newOrder")}>
+              {steps.map((s, i) => (
+                <li key={s} className={i < step ? "done" : i === step ? "now" : ""}>
+                  <button type="button" onClick={() => setStep(i)} aria-current={i === step ? "step" : undefined}>
+                    <span className="rx-step-dot">{i < step ? <Icon name="check" size={14} /> : i + 1}</span>
+                    <span>{t(s)}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+
+            <div className="rx-step" key={step}>
+              {step === 0 && (
+                <>
+                  <fieldset className="field">
+                    <legend>{t("lab.forLine")}</legend>
+                    {lines === null ? (
+                      <p className="muted">{t("loading")}</p>
+                    ) : (
+                      <div className="line-checks lab-lines">
+                        {lines.map((l) => (
+                          <label key={l.id} className={`check ${l.has_open_case ? "is-disabled" : ""}`}>
+                            <input type="radio" name="line" checked={lineId === l.id} disabled={l.has_open_case} onChange={() => pick(l)} />
+                            <span className="grow">
+                              {lang === "ar" ? l.procedure_name_ar || l.procedure_name_en : l.procedure_name_en || l.procedure_name_ar}
+                              {l.tooth ? ` · ${t("tooth.label", { n: l.tooth })}` : ""}
+                              <span className="muted small"> · {t(`line.status.${l.status}` as TKey)}</span>
+                            </span>
+                            {l.has_open_case ? <span className="pill pill-muted">{t("lab.inLab")}</span> : l.needs_lab ? <span className="pill pill-outline">{t("lab.labWork")}</span> : null}
+                          </label>
+                        ))}
+                        <label className="check">
+                          <input type="radio" name="line" checked={lineId === null} onChange={() => setLineId(null)} />
+                          <span className="grow">{t("lab.directOrder")}<span className="muted small"> · {t("lab.directHint")}</span></span>
+                        </label>
+                      </div>
+                    )}
+                  </fieldset>
+                  <div className="form-grid form-grid-2">
+                    <label className="field">
+                      <span>{t("lab.restoration")}</span>
+                      <select value={form.restoration} onChange={(e) => set({ restoration: e.target.value })}>
+                        {RESTORATIONS.map((r) => <option key={r} value={r}>{t(`lab.rest.${r}` as TKey)}</option>)}
+                      </select>
+                    </label>
+                    <label className="field">
+                      <span>{t("lab.material")}</span>
+                      <select value={form.material} onChange={(e) => set({ material: e.target.value })}>
+                        {MATERIALS.map((m) => <option key={m} value={m}>{t(`lab.mat.${m}` as TKey)}</option>)}
+                      </select>
+                    </label>
+                    <label className="field">
+                      <span>{t("lab.teethField")}</span>
+                      <input dir="ltr" value={form.teeth} placeholder={t("lab.teethPh")} onChange={(e) => set({ teeth: e.target.value })} />
+                    </label>
+                    <label className="field">
+                      <span>{t("lab.units")}</span>
+                      <input type="number" min="1" max="32" value={form.units} onChange={(e) => set({ units: Math.max(1, Number(e.target.value) || 1) })} />
+                    </label>
+                    {lineId === null && (
+                      <label className="field">
+                        <span>{t("lab.orderedByField")}</span>
+                        <select required value={form.dentist} onChange={(e) => set({ dentist: e.target.value })}>
+                          <option value="">{t("choose")}</option>
+                          {dentists.map((s) => <option key={s.id} value={s.id}>{personName({ ar: s.name_ar, en: s.name_en }, lang)}</option>)}
+                        </select>
+                      </label>
+                    )}
+                    <fieldset className="field choice-field">
+                      <legend>{t("lab.priority")}</legend>
+                      <div className="choice-row">
+                        {(["normal", "rush"] as const).map((p) => (
+                          <button key={p} type="button" className={`choice ${form.priority === p ? "active" : ""} ${p === "rush" ? "rush" : ""}`} aria-pressed={form.priority === p} onClick={() => set({ priority: p })}>
+                            {t(`lab.priority.${p}` as TKey)}
+                          </button>
+                        ))}
+                      </div>
+                    </fieldset>
+                  </div>
+                </>
+              )}
+
+              {step === 1 && (
+                <>
+                  {choice("lab.shadeGuide", "shade_guide", SHADE_GUIDES, "lab.guide")}
+                  <div className="form-grid form-grid-2">
+                    <label className="field">
+                      <span>{t("lab.shade")}</span>
+                      <input list="lab-shades" dir="ltr" value={form.shade} placeholder="A2" onChange={(e) => set({ shade: e.target.value })} />
+                      <datalist id="lab-shades">{SHADES.map((s) => <option key={s} value={s} />)}</datalist>
+                    </label>
+                    <label className="field">
+                      <span>{t("lab.stumpShade")}</span>
+                      <input dir="ltr" value={form.stump_shade} placeholder="ND2" onChange={(e) => set({ stump_shade: e.target.value })} />
+                    </label>
+                    <label className="field">
+                      <span>{t("lab.cervicalShade")}</span>
+                      <input list="lab-shades" dir="ltr" value={form.cervical_shade} onChange={(e) => set({ cervical_shade: e.target.value })} />
+                    </label>
+                    <label className="field">
+                      <span>{t("lab.incisalShade")}</span>
+                      <input list="lab-shades" dir="ltr" value={form.incisal_shade} onChange={(e) => set({ incisal_shade: e.target.value })} />
+                    </label>
+                  </div>
+                  {choice("lab.margin", "margin", MARGINS, "lab.margins")}
+                  {choice("lab.contacts", "contacts", CONTACTS, "lab.contact")}
+                  {choice("lab.occlusion", "occlusion", OCCLUSION, "lab.occl")}
+                  {bridge && choice("lab.pontic", "pontic", PONTICS, "lab.pontics")}
+                </>
+              )}
+
+              {step === 2 && (
+                <>
+                  {implant && (
+                    <div className="rx-implant">
+                      <div className="form-grid form-grid-2">
+                        <label className="field">
+                          <span>{t("lab.implantSystem")}</span>
+                          <input value={form.implant_system} placeholder="Straumann BLT" onChange={(e) => set({ implant_system: e.target.value })} />
+                        </label>
+                        <label className="field">
+                          <span>{t("lab.implantPlatform")}</span>
+                          <input dir="ltr" value={form.implant_platform} placeholder="RC 4.1" onChange={(e) => set({ implant_platform: e.target.value })} />
+                        </label>
+                      </div>
+                      {choice("lab.abutment", "abutment", ABUTMENTS, "lab.abut")}
+                      {choice("lab.retention", "retention", RETENTION, "lab.ret")}
+                    </div>
+                  )}
+                  <fieldset className="field">
+                    <legend>{t("lab.enclosures")}</legend>
+                    <div className="enclosure-grid">
+                      {ENCLOSURES.map((x) => (
+                        <label key={x} className={`enclosure ${form.enclosures.includes(x) ? "on" : ""}`}>
+                          <input
+                            type="checkbox"
+                            checked={form.enclosures.includes(x)}
+                            onChange={() => set({ enclosures: form.enclosures.includes(x) ? form.enclosures.filter((y) => y !== x) : [...form.enclosures, x] })}
+                          />
+                          <span>{t(`lab.encl.${x}` as TKey)}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <div className="form-grid form-grid-2">
+                    <label className="field">
+                      <span>{t("lab.pan")}</span>
+                      <input dir="ltr" value={form.pan_number} placeholder="P-14" onChange={(e) => set({ pan_number: e.target.value })} />
+                    </label>
+                    <label className="field">
+                      <span>{t("lab.outsourcedTo")}</span>
+                      <input value={form.outsourced_to} placeholder={t("lab.inHouseShort")} onChange={(e) => set({ outsourced_to: e.target.value })} />
+                    </label>
+                  </div>
+                </>
+              )}
+
+              {step === 3 && (
+                <>
+                  <div className="form-grid form-grid-2">
+                    <label className="field">
+                      <span>{t("lab.due")}</span>
+                      <input type="date" required min={isoToday()} value={form.due_date} onChange={(e) => set({ due_date: e.target.value })} />
+                    </label>
+                    <label className="field">
+                      <span>{t("lab.technician")}</span>
+                      <select value={form.technician} onChange={(e) => set({ technician: e.target.value })}>
+                        <option value="">{t("lab.unassigned")}</option>
+                        {technicians.filter((s) => s.staff_type === "technician").map((s) => <option key={s.id} value={s.id}>{personName({ ar: s.name_ar, en: s.name_en }, lang)}</option>)}
+                      </select>
+                    </label>
+                    {visits.length > 0 && (
+                      <label className="field">
+                        <span>{t("lab.tryIn")}</span>
+                        <select value={form.appointment} onChange={(e) => set({ appointment: e.target.value })}>
+                          <option value="">{t("lab.noVisit")}</option>
+                          {visits.map((v) => (
+                            <option key={v.id} value={v.id}>{new Date(v.start).toLocaleString(locale(lang), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
+                  </div>
+                  {late && <p className="pill pill-warn">{t("lab.lateWarning")}</p>}
+                  <label className="field">
+                    <span>{t("lab.instructions")}</span>
+                    <textarea rows={3} value={form.instructions} placeholder={t("lab.instructionsPh")} onChange={(e) => set({ instructions: e.target.value })} />
+                  </label>
+                </>
+              )}
+            </div>
+          </>
+        )}
         {error && <p className="form-error" role="alert">{error}</p>}
         <div className="form-actions">
-          <button type="button" className="btn" onClick={onClose}>{t("cancel")}</button>
-          <button type="submit" className="btn btn-primary" disabled={busy || !lineId}>{t("lab.send")}</button>
+          <button type="button" className="btn" onClick={step > 0 ? () => setStep(step - 1) : onClose}>{step > 0 ? t("lab.back") : t("cancel")}</button>
+          {pid && step < steps.length - 1 && (
+            <button type="submit" className="btn btn-primary">{t("lab.next")} <Icon name="arrow" size={16} className="flip-rtl" /></button>
+          )}
+          {pid && step === steps.length - 1 && (
+            <button type="submit" className="btn btn-primary" disabled={busy || !canSend}>{t("lab.send")}</button>
+          )}
         </div>
       </form>
     </Modal>
@@ -368,6 +618,30 @@ export function CaseView({ initial, onClose, onChanged }: { initial: LabCase; on
         )}
         {c.cancelled_at && <p className="notice pad-sm">{t("lab.cancelledBecause", { reason: c.cancel_reason })}</p>}
         {c.overdue && <p className="pill pill-warn">{t("lab.overdueBy", { date: fmtDate(c.due_date, lang) })}</p>}
+        {(c.priority === "rush" || c.on_hold || editable) && c.is_open && (
+          <div className="case-flags">
+            {c.priority === "rush" && <span className="rush-badge">{t("lab.priority.rush")}</span>}
+            {c.on_hold && <span className="hold-badge"><Icon name="clock" size={14} /> {t("lab.onHoldFor", { reason: c.hold_reason })}</span>}
+            {editable && (
+              <span className="toolbar">
+                <button className="btn btn-small" disabled={busy} onClick={() => void update({ priority: c.priority === "rush" ? "normal" : "rush" })}>
+                  {c.priority === "rush" ? t("lab.makeNormal") : t("lab.makeRush")}
+                </button>
+                <button
+                  className="btn btn-small"
+                  disabled={busy}
+                  onClick={() => {
+                    if (c.on_hold) return void update({ on_hold: false, hold_reason: "" });
+                    const reason = window.prompt(t("lab.holdReason"));
+                    if (reason) void update({ on_hold: true, hold_reason: reason });
+                  }}
+                >
+                  {c.on_hold ? t("lab.releaseHold") : t("lab.putOnHold")}
+                </button>
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="case-grid">
           <section className="case-stages">
@@ -408,7 +682,17 @@ export function CaseView({ initial, onClose, onChanged }: { initial: LabCase; on
           <section>
             <h3 className="sub-head">{t("lab.details")}</h3>
             <dl className="kv">
-              <div><dt>{t("lab.shade")}</dt><dd className="mono">{c.shade || "—"}</dd></div>
+              {c.pan_number && <div><dt>{t("lab.pan")}</dt><dd className="mono">{c.pan_number}</dd></div>}
+              <div><dt>{t("lab.shade")}</dt><dd className="mono">{[c.shade || "—", c.shade_guide !== "vita_classic" ? t(`lab.guide.${c.shade_guide}` as TKey) : ""].filter(Boolean).join(" · ")}</dd></div>
+              {c.stump_shade && <div><dt>{t("lab.stumpShade")}</dt><dd className="mono">{c.stump_shade}</dd></div>}
+              {(c.cervical_shade || c.incisal_shade) && <div><dt>{t("lab.layers")}</dt><dd className="mono">{[c.cervical_shade, c.incisal_shade].filter(Boolean).join(" / ")}</dd></div>}
+              {c.margin && <div><dt>{t("lab.margin")}</dt><dd>{t(`lab.margins.${c.margin}` as TKey)}</dd></div>}
+              {c.contacts && <div><dt>{t("lab.contacts")}</dt><dd>{t(`lab.contact.${c.contacts}` as TKey)}</dd></div>}
+              {c.occlusion && <div><dt>{t("lab.occlusion")}</dt><dd>{t(`lab.occl.${c.occlusion}` as TKey)}</dd></div>}
+              {c.pontic && <div><dt>{t("lab.pontic")}</dt><dd>{t(`lab.pontics.${c.pontic}` as TKey)}</dd></div>}
+              {c.implant_system && <div><dt>{t("lab.implantSystem")}</dt><dd>{[c.implant_system, c.implant_platform].filter(Boolean).join(" · ")}</dd></div>}
+              {c.abutment && <div><dt>{t("lab.abutment")}</dt><dd>{t(`lab.abut.${c.abutment}` as TKey)}{c.retention ? ` · ${t(`lab.ret.${c.retention}` as TKey)}` : ""}</dd></div>}
+              {c.outsourced_to && <div><dt>{t("lab.outsourcedTo")}</dt><dd>{c.outsourced_to}{c.outsource_tracking ? ` · ${c.outsource_tracking}` : ""}</dd></div>}
               <div><dt>{t("lab.units")}</dt><dd>{c.units}</dd></div>
               <div><dt>{t("lab.due")}</dt><dd>{fmtDate(c.due_date, lang)}</dd></div>
               {c.appointment_start && <div><dt>{t("lab.tryIn")}</dt><dd>{new Date(c.appointment_start).toLocaleString(locale(lang), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</dd></div>}
@@ -424,6 +708,12 @@ export function CaseView({ initial, onClose, onChanged }: { initial: LabCase; on
                 </dd>
               </div>
             </dl>
+            {c.enclosures.length > 0 && (
+              <>
+                <h3 className="sub-head">{t("lab.enclosures")}</h3>
+                <p className="chip-row">{c.enclosures.map((x) => <span key={x} className="enclosure-chip"><Icon name="check" size={13} /> {t(`lab.encl.${x}` as TKey)}</span>)}</p>
+              </>
+            )}
             {c.instructions && (
               <>
                 <h3 className="sub-head">{t("lab.instructions")}</h3>

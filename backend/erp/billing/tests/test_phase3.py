@@ -134,3 +134,30 @@ class DailyTakingsTests(Phase3Base):
         self.assertEqual(days[0]["total"], "0.00")
         self.login("drsara")
         self.assertEqual(self.client.get("/api/billing/daily/").status_code, 403)
+
+
+class FinanceDashboardTests(Phase3Base):
+    def test_dashboard_adds_up(self):
+        inv = self.invoice()
+        self.pay(inv, "1000.00", method="instapay")
+        self.pay(inv, "500.00")
+        crown = self.invoice(plan_lines=[self.crown["id"]])
+        self.client.post(f"/api/billing/invoices/{crown['id']}/installments/", {"count": 2, "first_due": str(self.today)}, format="json")
+        data = self.client.get("/api/billing/dashboard/", {"start": str(self.today - timedelta(days=6)), "end": str(self.today)}).data
+        self.assertEqual(data["billed"], "8800.00")
+        self.assertEqual(data["collected"], "1500.00")
+        self.assertEqual(data["invoice_count"], 2)
+        self.assertEqual(data["bucket"], "day")
+        self.assertEqual(len(data["trend"]), 7)
+        self.assertEqual(data["trend"][-1], {"period": str(self.today), "billed": "8800.00", "collected": "1500.00"})
+        self.assertEqual([m["method"] for m in data["by_method"]], ["instapay", "cash"])
+        self.assertEqual(data["by_dentist"][0]["billed"], "8800.00")
+        self.assertEqual(data["by_dentist"][0]["collected"], "1500.00")
+        self.assertEqual(data["aging"]["0_30"], "7300.00")
+        self.assertEqual(data["top_debtors"][0]["balance"], "7300.00")
+        self.assertEqual(data["now"]["today"], "1500.00")
+        self.assertEqual(data["now"]["outstanding"], "7300.00")
+        self.assertEqual(len(data["installments_due"]), 1)  # the second one is a month out
+        self.assertEqual(data["collection_rate"], 17.0)
+        bad = self.client.get("/api/billing/dashboard/", {"start": str(self.today), "end": str(self.today - timedelta(days=1))})
+        self.assertEqual(bad.status_code, 400)
