@@ -275,3 +275,116 @@ export interface PatientConsent {
   signed_at: string | null;
   created_at: string;
 }
+
+// Phase 3: billing
+export type PayMethod = "cash" | "instapay" | "card" | "wallet" | "bank";
+export interface BillingPatient { id: number; ar: string; en: string; file_number: string; phone: string }
+export interface InvoiceLine {
+  id: number;
+  plan_line: number | null;
+  procedure: number | null;
+  dentist: number | null;
+  dentist_name: { ar: string; en: string } | null;
+  description: string;
+  tooth: number | null;
+  quantity: number;
+  unit_price: string;
+  discount: string;
+  total: string;
+}
+export interface Installment {
+  id: number;
+  invoice: number;
+  invoice_number: string;
+  patient_info: BillingPatient;
+  number: number;
+  due_date: string;
+  amount: string;
+  paid: string;
+  remaining: string;
+  status: "paid" | "overdue" | "partly_paid" | "due";
+}
+export interface Invoice {
+  id: number;
+  number: string;
+  patient: number;
+  patient_info: BillingPatient;
+  branch: number | null;
+  issue_date: string;
+  status: "issued" | "void";
+  payment_status: "unpaid" | "partly_paid" | "paid" | "void";
+  discount: string;
+  tax_rate: string;
+  notes: string;
+  void_reason: string;
+  voided_at: string | null;
+  lines: InvoiceLine[];
+  installments: Installment[];
+  totals: { subtotal: string; tax: string; total: string; paid: string; balance: string };
+  created_at: string;
+}
+export interface Payment {
+  id: number;
+  receipt_number: string;
+  patient: number;
+  patient_info: BillingPatient;
+  invoice: number | null;
+  invoice_number: string;
+  installment: number | null;
+  installment_number: number | null;
+  branch: number | null;
+  paid_on: string;
+  amount: string;
+  method: PayMethod;
+  reference: string;
+  notes: string;
+  voided_at: string | null;
+  void_reason: string;
+  received_by: string;
+  created_at: string;
+}
+export interface BillableLine {
+  id: number;
+  plan_title: string;
+  procedure_name_en: string;
+  procedure_name_ar: string;
+  tooth: number | null;
+  surfaces: string;
+  status: string;
+  net: string;
+  dentist: { ar: string; en: string };
+}
+export interface CashboxClosing {
+  id: number;
+  branch: number | null;
+  date: string;
+  totals: Record<string, string>;
+  payment_count: number;
+  expected_cash: string;
+  counted_cash: string;
+  difference: string;
+  notes: string;
+  closed_by: string;
+  created_at: string;
+}
+export interface Cashbox {
+  date: string;
+  branch: number | null;
+  totals: Record<string, string>;
+  total: string;
+  expected_cash: string;
+  payments: Payment[];
+  voided: Payment[];
+  closing: CashboxClosing | null;
+}
+export interface CommissionRow {
+  dentist: number;
+  name: { ar: string; en: string };
+  rule: string;
+  value: string;
+  billed: string;
+  collected: string;
+  procedures: number;
+  commission: string;
+}
+export interface PatientAccount { billed: string; paid: string; balance: string; on_account: string }

@@ -5,6 +5,7 @@ import { useI18n } from "./i18n";
 import { Layout } from "./components/Layout";
 import { Audit } from "./pages/Audit";
 import { ComingSoon, NoAccess } from "./pages/ComingSoon";
+import { Billing } from "./pages/Billing";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Appointments } from "./pages/Appointments";
@@ -39,7 +40,7 @@ export function App() {
         <Route path="patients/:id" element={<Guard module="patients"><PatientProfile /></Guard>} />
         <Route path="appointments" element={<Guard module="appointments"><Appointments /></Guard>} />
         <Route path="clinical" element={<Guard module="clinical"><Clinical /></Guard>} />
-        <Route path="billing" element={<ComingSoon title="nav.billing" phase={3} />} />
+        <Route path="billing" element={<Guard module="billing"><Billing /></Guard>} />
         <Route path="lab" element={<ComingSoon title="nav.lab" phase={4} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
