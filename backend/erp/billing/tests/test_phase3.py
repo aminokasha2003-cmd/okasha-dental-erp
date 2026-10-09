@@ -120,3 +120,17 @@ class CashboxAndCommissionTests(Phase3Base):
         self.assertEqual(self.client.get("/api/billing/invoices/").status_code, 403)
         self.login("other")
         self.assertEqual(self.client.get("/api/billing/invoices/").data["results"], [])
+
+
+class DailyTakingsTests(Phase3Base):
+    def test_week_of_takings(self):
+        inv = self.invoice()
+        self.pay(inv, "1000.00")
+        self.pay(inv, "500.00", method="card")
+        days = self.client.get("/api/billing/daily/").data
+        self.assertEqual(len(days), 7)
+        self.assertEqual(days[-1]["date"], self.today)
+        self.assertEqual(days[-1]["total"], "1500.00")
+        self.assertEqual(days[0]["total"], "0.00")
+        self.login("drsara")
+        self.assertEqual(self.client.get("/api/billing/daily/").status_code, 403)

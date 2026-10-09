@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { get } from "../api";
 import { useAuth } from "../auth";
@@ -38,16 +38,6 @@ const LATER: NavItem[] = [
   { to: "/crm", label: "nav.crm", icon: "chart" },
 ];
 
-const COLLAPSED_KEY = "erp.sidebar.collapsed";
-
-function readCollapsed() {
-  try {
-    return window.localStorage.getItem(COLLAPSED_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
 /** Small counts on the sidebar: patients waiting, notes to sign, lab work needing this user. */
 function useBadges() {
   const { can } = useAuth();
@@ -86,7 +76,12 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const badges = useBadges();
-  const [collapsed, setCollapsed] = useState(readCollapsed);
+  // On desktop the sidebar is an icon rail that opens over the page while the
+  // pointer (or keyboard focus) is on it. A short delay stops it flashing open
+  // when the pointer only passes over.
+  const [peek, setPeek] = useState(false);
+  const peekTimer = useRef<number>();
+  const collapsed = !peek;
   const [open, setOpen] = useState(false);
   const visible = (items: NavItem[]) => items.filter((i) => !i.module || can(i.module));
   const displayName = me ? [me.first_name, me.last_name].filter(Boolean).join(" ") || me.username : "";
@@ -102,16 +97,16 @@ export function Layout() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const toggleCollapsed = () => {
-    setCollapsed((c) => {
-      try {
-        window.localStorage.setItem(COLLAPSED_KEY, c ? "0" : "1");
-      } catch {
-        /* storage blocked */
-      }
-      return !c;
-    });
+  const openPeek = (delay: number) => {
+    window.clearTimeout(peekTimer.current);
+    peekTimer.current = window.setTimeout(() => setPeek(true), delay);
   };
+  const closePeek = () => {
+    window.clearTimeout(peekTimer.current);
+    setPeek(false);
+  };
+  useEffect(() => () => window.clearTimeout(peekTimer.current), []);
+  useEffect(() => closePeek(), [location.pathname]);
 
   let index = 0;
   const link = (item: NavItem) => {
@@ -141,9 +136,16 @@ export function Layout() {
   const date = new Date().toLocaleDateString(lang === "ar" ? "ar-EG" : "en-GB", { weekday: "long", day: "numeric", month: "long" });
 
   return (
-    <div className={`shell ${collapsed ? "is-collapsed" : ""} ${open ? "menu-open" : ""}`}>
+    <div className={`shell is-rail ${collapsed ? "is-collapsed" : "is-peek"} ${open ? "menu-open" : ""}`}>
       <div className="sidebar-scrim" onClick={() => setOpen(false)} aria-hidden="true" />
-      <aside className="sidebar" id="sidebar">
+      <aside
+        className="sidebar"
+        id="sidebar"
+        onMouseEnter={() => openPeek(140)}
+        onMouseLeave={closePeek}
+        onFocus={() => openPeek(0)}
+        onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && closePeek()}
+      >
         <div className="brand">
           <div className="brand-mark">
             <AnimatedLogo tone="dark" />
@@ -152,9 +154,6 @@ export function Layout() {
             <strong>{me?.clinic ? name(me.clinic) : t("appName")}</strong>
             <span className="brand-sub">Clinic ERP</span>
           </div>
-          <button className="side-icon-btn collapse-btn" onClick={toggleCollapsed} aria-label={collapsed ? t("nav.expand") : t("nav.collapse")} title={collapsed ? t("nav.expand") : t("nav.collapse")}>
-            <Icon name="collapse" size={18} />
-          </button>
           <button className="side-icon-btn close-btn" onClick={() => setOpen(false)} aria-label={t("close")}>
             <Icon name="close" size={18} />
           </button>

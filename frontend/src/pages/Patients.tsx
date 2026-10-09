@@ -66,7 +66,7 @@ export function Patients() {
   const [page, setPage] = useState<Page<Patient> | null>(null);
   const [rows, setRows] = useState<Patient[]>([]);
   const [error, setError] = useState("");
-  const [adding, setAdding] = useState(false);
+  const [adding, setAdding] = useState(params.get("new") === "1");
 
   useEffect(() => {
     // Wait a moment after typing stops before searching.

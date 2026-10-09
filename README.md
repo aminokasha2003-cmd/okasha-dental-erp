@@ -90,6 +90,11 @@ The look follows the approved Okasha design in `docs/design/` (colours, fonts, l
 - **Patient file.** The lab orders card from the design: open work with its stage list, and finished work with its delivery date.
 - Lab technicians see the patient's name and file number only, never phone numbers or the rest of the patient file. Reception does not see the lab.
 
+## Home page and sidebar
+
+- **Widget home.** Today's date with visits seen, money collected today and patients waiting; a live clock in the middle; quick buttons for the most used screens (only the ones the user is allowed to open); today's visits laid out chair by chair with a line for the current time; who is in the chair now and how long is left; this week's takings drawn as teeth with today highlighted; patients due for a check-up (no completed visit in six months and nothing booked) with a WhatsApp button that opens a ready message in the patient's language; a lab summary for lab users. The setup checklist only appears while something is still missing.
+- **Sidebar.** On a computer it stays as a slim icon rail and opens over the page when the mouse rests on it. On a phone it is still the menu button. Scrollbars are hidden in the sidebar and on the patient file's section menu.
+- **Logo.** The tooth logo in the sidebar and on the sign-in screen jumps and spins once every four seconds (off for people who turn motion down in their system settings).
 ## Look and feel
 
 - **Light and dark mode.** The sun and moon button in the top bar (and on the sign-in screen) switches theme. The choice is remembered on that device; until someone picks, it follows the device setting.
