@@ -22,9 +22,10 @@ import {
   useClinical,
 } from "./PatientClinical";
 import { BalanceStat, BillingCard, useAccount } from "./PatientBilling";
+import { LabCard } from "./LabParts";
 
 // Layout follows the approved patient card design (handoff in the project files).
-// Clinical sections live in PatientClinical.tsx, billing in PatientBilling.tsx; lab arrives with phase 4.
+// Clinical sections live in PatientClinical.tsx, billing in PatientBilling.tsx, lab orders in LabParts.tsx.
 
 const CONDITIONS = [
   "diabetes",
@@ -133,6 +134,7 @@ export function PatientProfile() {
     { id: "clinical-notes", label: "note.title", show: clinicalOn },
     { id: "imaging", label: "img.title", show: can("files") },
     { id: "medical", label: can("clinical") ? "pt.history" : "pt.alerts", show: true },
+    { id: "lab", label: "lab.orders", show: can("lab") },
     { id: "prescriptions", label: "rx.title", show: clinicalOn },
     { id: "consents", label: "consent.title", show: clinicalOn },
     { id: "personal", label: "pt.personal", show: true },
@@ -261,6 +263,7 @@ export function PatientProfile() {
         <div className="pf-side">
           <MedicalCard patient={patient} onChange={load} />
           {can("appointments") && next && <NextAppointment appointment={next} onReschedule={() => setDialog({ appointment: next })} onChanged={loadVisits} />}
+          {can("lab") && <LabCard patientId={patient.id} active={patient.is_active} />}
           {clinicalOn && <PrescriptionsCard patient={patient} data={clinical} />}
           {clinicalOn && <ConsentsCard patient={patient} data={clinical} />}
           <PersonalCard patient={patient} branchName={choices.branches.find((b) => b.id === patient.home_branch)} dentistName={choices.dentists.find((d) => d.id === patient.preferred_dentist)} onEdit={can("patients", "edit") ? () => setEditing(true) : undefined} />

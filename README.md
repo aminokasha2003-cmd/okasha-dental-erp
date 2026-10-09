@@ -46,7 +46,7 @@ The clinic itself lives in `core` rather than `masterdata`, because it is the te
 
 ## Design
 
-The look follows the approved Okasha design in `docs/design/` (colours, fonts, logo, background pattern, and the patient card layout). The dental chart, treatment plan, billing and lab sections of that design are built with phases 2 to 4.
+The look follows the approved Okasha design in `docs/design/` (colours, fonts, logo, background pattern, and the patient card layout). The dental chart, treatment plan, billing and lab sections of that design are built in phases 2 to 4.
 
 ## What phase 1 gives you
 
@@ -77,6 +77,18 @@ The look follows the approved Okasha design in `docs/design/` (colours, fonts, l
 - **Doctor commissions.** For a date range, what each dentist billed and collected and their commission under the rule set on their staff record (a percentage of collected, a percentage of billed, or a fixed amount per procedure). Payments are shared across an invoice's lines in proportion to their value. Owner and accountant only.
 - **Patient balance.** The patient file shows the balance due at the top and a billing section with billed, paid and owed, a paid bar, invoices and payments.
 - Reception can invoice, take payments and close the day. Dentists don't see billing. Only the owner and accountant can void.
+
+## What phase 4 gives you
+
+- **Lab orders from the treatment plan.** A dentist orders lab work from a plan line on the patient file. Lab procedures (zirconia crown, bridge, veneer, denture and so on) are listed first, and the restoration and material are filled in from the procedure. The order carries shade, units, teeth for a bridge, instructions, a due date and the try-in visit (with a warning when the work would be due after it). Numbers run LAB-00001, ... per clinic, and one plan line has one open case at a time.
+- **Lab board.** Open cases in columns by stage: scan received, CAD design, milling, sintering and glaze, ready for try-in. Technicians move a case with one tap or by dragging it, filter to their own, unassigned or late cases, and every move records who and when, with an optional note. When a case is ready, the ordering dentist gets an in-app message and a count on the sidebar.
+- **Technician assignment.** Assign or reassign a technician on the case or when ordering.
+- **Design files.** Intraoral scans, STL designs, photos and PDFs attach to the case.
+- **Remakes.** Finished work can be remade with a reason (fit, shade, fracture, design, patient request) and who carries the cost. The remake keeps a link to the first piece, and a first piece remade before delivery is counted as scrap.
+- **Cost per unit.** Material and labour cost per case. The owner's cost report shows, for a period, cost per unit by restoration and material, remakes, scrap, the remake rate and how much work was ready on time.
+- **Work ticket.** A printed ticket with the case details for the lab bench.
+- **Patient file.** The lab orders card from the design: open work with its stage list, and finished work with its delivery date.
+- Lab technicians see the patient's name and file number only, never phone numbers or the rest of the patient file. Reception does not see the lab.
 
 ## Look and feel
 
@@ -152,6 +164,7 @@ The same `Dockerfile` runs on any host that builds containers (Railway, Fly.io, 
 
 ## Not done yet
 
+- The lab takes the clinic's own cases only. Outside dentists as lab clients, with their own invoicing, are not built (an open question in the development structure document).
 - Billing has no tax receipts for the Egyptian Tax Authority e-receipt system yet, and no refunds beyond voiding a payment.
 - API error messages are in English only. Screen text is in both languages.
 - The calendar shows one day at a time. A week view, online booking and recurring visits are not built.

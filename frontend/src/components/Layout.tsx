@@ -48,7 +48,7 @@ function readCollapsed() {
   }
 }
 
-/** Small counts on the sidebar: patients waiting, notes to sign. */
+/** Small counts on the sidebar: patients waiting, notes to sign, lab work needing this user. */
 function useBadges() {
   const { can } = useAuth();
   const [badges, setBadges] = useState<Record<string, number>>({});
@@ -57,6 +57,10 @@ function useBadges() {
       if (can("appointments"))
         get<{ waiting: unknown[] }>("/api/appointments/queue/")
           .then((q) => setBadges((b) => ({ ...b, "/appointments": q.waiting.length })))
+          .catch(() => undefined);
+      if (can("lab"))
+        get<{ attention: number }>("/api/lab/summary/")
+          .then((s) => setBadges((b) => ({ ...b, "/lab": s.attention })))
           .catch(() => undefined);
       if (can("clinical", "approve"))
         get<unknown[]>("/api/clinical/visit-notes/?unsigned=1")
