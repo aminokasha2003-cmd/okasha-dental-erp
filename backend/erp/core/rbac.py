@@ -92,7 +92,7 @@ DEFAULT_ROLES = {
             "masterdata": ["view"],
             "billing": ALL,
             "inventory": ["view", "approve"],
-            "staff": ["view", "edit"],
+            "staff": ["view", "create", "edit", "approve"],
             "reports": ["view"],
         },
     ),
