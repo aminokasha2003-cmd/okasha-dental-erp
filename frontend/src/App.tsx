@@ -8,6 +8,8 @@ import { NoAccess } from "./pages/ComingSoon";
 import { Billing } from "./pages/Billing";
 import { Lab } from "./pages/Lab";
 import { Inventory } from "./pages/Inventory";
+import { Payroll } from "./pages/Payroll";
+import { MyWork } from "./pages/MyWork";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Appointments } from "./pages/Appointments";
@@ -45,6 +47,8 @@ export function App() {
         <Route path="billing" element={<Guard module="billing"><Billing /></Guard>} />
         <Route path="lab" element={<Guard module="lab"><Lab /></Guard>} />
         <Route path="inventory" element={<Guard module="inventory"><Inventory /></Guard>} />
+        <Route path="payroll" element={<Guard module="staff"><Payroll /></Guard>} />
+        <Route path="my-work" element={<MyWork />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

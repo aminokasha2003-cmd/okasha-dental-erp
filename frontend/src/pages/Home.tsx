@@ -7,6 +7,7 @@ import { Icon, type IconName } from "../components/Icon";
 import { locale, money } from "../format";
 import type { Appointment, Chair, LabSummary } from "../types";
 import { personName, useCurrency } from "./BillingParts";
+import { MyClockWidget } from "./MyWork";
 
 // The home page is a set of widgets, after Amin's dashboard reference: today at a
 // glance, a clock, quick buttons, the chairs timeline, who is in the chair, the
@@ -74,6 +75,7 @@ export function Home() {
       </div>
       {can("appointments") && <ChairTimeline rows={today} />}
       <div className="home-widgets">
+        <MyClockWidget />
         {can("appointments") && <InChairs queue={queue} />}
         {can("billing") && <WeekTakings days={takings} />}
         {can("lab") && <LabWidget />}

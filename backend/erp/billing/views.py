@@ -11,8 +11,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from erp.core.api import ClinicScopedViewSet, ModulePermission, require_clinic
-from erp.masterdata.models import Branch, StaffMember
+from erp.masterdata.models import Branch
 
+from .commissions import commission_rows
 from .models import ZERO, CashboxClosing, Installment, Invoice, InvoiceLine, Payment
 from .serializers import (
     CashboxClosingSerializer,
@@ -349,54 +350,18 @@ class CommissionReportView(APIView):
         today = timezone.localdate()
         start = parse_day(request.query_params.get("start"), today.replace(day=1))
         end = parse_day(request.query_params.get("end"), today)
-        rows = {}
-
-        def row(dentist):
-            if dentist.pk not in rows:
-                rows[dentist.pk] = {"dentist": dentist, "billed": ZERO, "collected": ZERO, "procedures": 0}
-            return rows[dentist.pk]
-
-        lines = InvoiceLine.objects.filter(
-            invoice__clinic=clinic, invoice__status="issued", invoice__issue_date__range=(start, end), dentist__isnull=False
-        ).select_related("dentist")
-        for line in lines:
-            r = row(line.dentist)
-            r["billed"] += line.total
-            r["procedures"] += line.quantity
-
-        payments = Payment.objects.filter(
-            clinic=clinic, voided_at__isnull=True, paid_on__range=(start, end), invoice__isnull=False, invoice__status="issued"
-        ).prefetch_related("invoice__lines__dentist")
-        for payment in payments:
-            inv_lines = list(payment.invoice.lines.all())
-            gross = sum((ln.total for ln in inv_lines), ZERO)
-            if gross <= 0:
-                continue
-            for ln in inv_lines:
-                if ln.dentist is not None:
-                    row(ln.dentist)["collected"] += payment.amount * ln.total / gross
-
-        for member in StaffMember.objects.filter(clinic=clinic, staff_type="dentist", is_active=True):
-            row(member)
-
         out = []
-        for r in rows.values():
+        for r in commission_rows(clinic, start, end).values():
             d = r["dentist"]
-            value = d.commission_value
-            commission = {
-                "percent_collected": r["collected"] * value / 100,
-                "percent_billed": r["billed"] * value / 100,
-                "fixed_per_procedure": value * r["procedures"],
-            }.get(d.commission_type, ZERO)
             out.append({
                 "dentist": d.pk,
                 "name": {"ar": d.name_ar, "en": d.name_en},
                 "rule": d.commission_type,
-                "value": money(value),
+                "value": money(d.commission_value),
                 "billed": money(r["billed"]),
                 "collected": money(r["collected"].quantize(Decimal("0.01"))),
                 "procedures": r["procedures"],
-                "commission": money(Decimal(commission).quantize(Decimal("0.01"))),
+                "commission": money(r["commission"].quantize(Decimal("0.01"))),
             })
         out.sort(key=lambda x: x["name"]["en"])
         return Response({"start": start.isoformat(), "end": end.isoformat(), "rows": out})

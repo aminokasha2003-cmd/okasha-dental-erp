@@ -754,3 +754,352 @@ export interface FinanceDashboard {
   installments_due: { id: number; invoice: number; invoice_number: string; due_date: string; remaining: string; overdue: boolean; patient: { id: number; ar: string; en: string; file_number: string } }[];
   installments_upcoming_total: string;
 }
+
+/* ---------------------------------------------------- staff and payroll (phase 6) */
+
+export type PayType = "monthly" | "daily" | "hourly" | "commission_only";
+export type PayoutMethod = "cash" | "bank" | "wallet" | "instapay";
+export type LeaveKind = "annual" | "sick" | "casual" | "unpaid" | "other";
+export type LeaveStatus = "pending" | "approved" | "rejected" | "cancelled";
+export type DayStatus = "off" | "scheduled" | "not_in" | "in" | "out" | "missing_out" | "absent" | "leave";
+export type RunStatus = "draft" | "approved" | "paid";
+export type PayItemKind =
+  | "bonus"
+  | "allowance"
+  | "other_addition"
+  | "lateness"
+  | "absence"
+  | "unpaid_leave"
+  | "advance"
+  | "penalty"
+  | "other_deduction";
+
+export interface StaffRef {
+  id: number;
+  en: string;
+  ar: string;
+  staff_type: string;
+  color: string;
+}
+
+export interface PayrollSettings {
+  employee_insurance_rate: string;
+  employer_insurance_rate: string;
+  late_grace_minutes: number;
+  deduct_lateness: boolean;
+  deduct_absence: boolean;
+  work_days_per_month: number;
+  hours_per_day: string;
+}
+
+export interface EmploymentProfile {
+  pay_type: PayType;
+  base_salary: string;
+  daily_rate: string;
+  hourly_rate: string;
+  overtime_multiplier: string;
+  hire_date: string | null;
+  national_id: string;
+  payout_method: PayoutMethod;
+  payout_account: string;
+  insured: boolean;
+  insurable_wage: string;
+  annual_leave_days: number;
+  notes: string;
+  updated_at?: string;
+}
+
+export interface LeaveBalance {
+  year: number;
+  entitlement: number;
+  used: number;
+  pending: number;
+  remaining: number;
+}
+
+export interface StaffProfileRow extends StaffRef {
+  is_active: boolean;
+  user: number | null;
+  branches: number[];
+  commission_type: string;
+  commission_value: string;
+  profile: EmploymentProfile | null;
+  leave: LeaveBalance;
+}
+
+export interface ShiftTemplate {
+  id: number;
+  name_en: string;
+  name_ar: string;
+  start_time: string;
+  end_time: string;
+  break_minutes: number;
+  branch: number | null;
+  color: string;
+  is_active: boolean;
+  hours: number;
+}
+
+export interface ShiftOut {
+  id: number;
+  start: string;
+  end: string;
+  break_minutes: number;
+  minutes: number;
+  branch: number | null;
+  template: number | null;
+  color: string;
+  name: { en: string; ar: string } | null;
+  note: string;
+}
+
+export interface RecordOut {
+  id: number;
+  date: string;
+  in: string;
+  out: string | null;
+  clock_in: string;
+  clock_out: string | null;
+  source: "self" | "manual";
+  branch: number | null;
+  note: string;
+  minutes: number;
+}
+
+export interface DayRow {
+  date: string;
+  status: DayStatus;
+  staff: StaffRef;
+  shifts: ShiftOut[];
+  records: RecordOut[];
+  leave: { id: number; kind: LeaveKind } | null;
+  rostered_minutes: number;
+  worked_minutes: number;
+  worked_now: number;
+  late_minutes: number;
+  early_leave_minutes: number;
+  overtime_minutes: number;
+}
+
+export interface DayBoard {
+  date: string;
+  grace: number;
+  counts: { rostered: number; in_now: number; late: number; absent: number; not_in: number; on_leave: number };
+  rows: DayRow[];
+}
+
+export interface StaffSummary {
+  rostered: number;
+  in_now: number;
+  late: number;
+  absent: number;
+  not_in: number;
+  on_leave: number;
+  pending_leave: number;
+  draft_runs: number;
+  approved_runs: number;
+  active_advances: number;
+}
+
+export interface RosterWeek {
+  start: string;
+  end: string;
+  days: string[];
+  rows: { staff: StaffRef; minutes: number; days: { date: string; shifts: ShiftOut[]; leave: LeaveKind | null }[] }[];
+}
+
+export interface MonthSummary {
+  rostered_days: number;
+  present_days: number;
+  days_worked: number;
+  absent_days: number;
+  late_days: number;
+  rostered_minutes: number;
+  worked_minutes: number;
+  late_minutes: number;
+  early_leave_minutes: number;
+  overtime_minutes: number;
+  missing_out: number;
+  leave_days: Partial<Record<LeaveKind, number>>;
+}
+
+export interface AttendanceRecord {
+  id: number;
+  staff: number;
+  staff_info: StaffRef;
+  date: string;
+  clock_in: string;
+  clock_out: string | null;
+  in_local: string;
+  out_local: string | null;
+  branch: number | null;
+  source: "self" | "manual";
+  note: string;
+  edit_reason: string;
+  minutes: number;
+}
+
+export interface LeaveRequest {
+  id: number;
+  staff: number;
+  staff_info: StaffRef;
+  kind: LeaveKind;
+  start_date: string;
+  end_date: string;
+  days: number;
+  reason: string;
+  status: LeaveStatus;
+  decided_by_name: string | null;
+  decided_at: string | null;
+  decision_note: string;
+  created_at: string;
+}
+
+export interface LeaveBalanceRow extends LeaveBalance {
+  staff: StaffRef;
+  by_kind: Partial<Record<LeaveKind, number>>;
+}
+
+export interface SalaryAdvance {
+  id: number;
+  staff: number;
+  staff_info: StaffRef;
+  date: string;
+  amount: string;
+  monthly_installment: string;
+  reason: string;
+  status: "active" | "repaid" | "cancelled";
+  repaid: string;
+  remaining: string;
+  repayments: { date: string; amount: string; run: number | null }[];
+  created_at: string;
+}
+
+export interface PayItem {
+  id?: number;
+  kind: PayItemKind;
+  label: string;
+  amount: string;
+  is_manual?: boolean;
+  direction?: "add" | "deduct";
+  advance?: number | null;
+}
+
+export interface PayrollLine {
+  id: number;
+  run: number;
+  run_status: RunStatus;
+  period: string;
+  staff: number;
+  staff_info: StaffRef;
+  pay_type: PayType;
+  rate: string;
+  figures: MonthSummary & {
+    hourly_equivalent: string;
+    daily_equivalent: string;
+    overtime_multiplier: string;
+    unpaid_leave_days: number;
+    worked_out: Record<"lateness" | "absence" | "unpaid_leave", string>;
+  };
+  base_pay: string;
+  overtime_pay: string;
+  commission: string;
+  commission_start: string | null;
+  commission_end: string | null;
+  commission_note: string;
+  employee_insurance: string;
+  employer_insurance: string;
+  income_tax: string;
+  waived: string[];
+  additions: string;
+  item_deductions: string;
+  gross: string;
+  total_deductions: string;
+  net: string;
+  payout_method: PayoutMethod;
+  payout_account: string;
+  note: string;
+  items: PayItem[];
+}
+
+export interface RunTotals {
+  people: number;
+  base_pay: string;
+  overtime_pay: string;
+  commission: string;
+  employee_insurance: string;
+  employer_insurance: string;
+  income_tax: string;
+  gross: string;
+  total_deductions: string;
+  net: string;
+  additions: string;
+  item_deductions: string;
+  cost: string;
+  by_method: { method: PayoutMethod; count: number; net: string }[];
+}
+
+export interface PayrollRun {
+  id: number;
+  period: string;
+  branch: number | null;
+  branch_info: { id: number; en: string; ar: string } | null;
+  commission_period: string;
+  status: RunStatus;
+  notes: string;
+  calculated_at: string | null;
+  approved_by_name: string | null;
+  approved_at: string | null;
+  paid_by_name: string | null;
+  paid_on: string | null;
+  totals: RunTotals;
+  created_at: string;
+  lines?: PayrollLine[];
+}
+
+export interface Payslip {
+  line: PayrollLine;
+  run: { id: number; period: string; status: RunStatus; paid_on: string | null; branch: { id: number; en: string; ar: string } | null };
+  staff: StaffRef & { national_id: string; hire_date: string | null };
+  advances_remaining: string;
+}
+
+export interface StaffDashboard {
+  month: string;
+  headcount: number;
+  on_payroll: number;
+  payroll_cost: string;
+  payroll_net: string;
+  payroll_status: RunStatus | null;
+  attendance_rate: number | null;
+  rostered_days: number;
+  absent_days: number;
+  late_minutes: number;
+  late_days: number;
+  overtime_minutes: number;
+  trend: { month: string; gross: string; employer_insurance: string; cost: string; net: string; status: RunStatus | null }[];
+  top_late: { staff: StaffRef; minutes: number; days: number }[];
+  overtime: { staff: StaffRef; minutes: number }[];
+  leave_by_kind: { kind: LeaveKind; days: number }[];
+  commission: { staff: StaffRef; amount: string; paid: boolean }[];
+  advances_outstanding: string;
+  advances: { id: number; staff: StaffRef; remaining: string; installment: string }[];
+}
+
+export interface MyStaff {
+  staff: StaffRef;
+  today: {
+    date: string;
+    status: DayStatus;
+    shifts: ShiftOut[];
+    records: RecordOut[];
+    leave: { id: number; kind: LeaveKind } | null;
+    worked_now: number;
+    late_minutes: number;
+    open_record: RecordOut | null;
+  };
+  grace: number;
+  month: MonthSummary & { month: string };
+  payslips: { id: number; period: string; status: RunStatus; net: string; paid_on: string | null }[];
+  leave: { balance: LeaveBalance; requests: LeaveRequest[] };
+}
