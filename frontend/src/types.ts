@@ -860,7 +860,7 @@ export interface RecordOut {
   out: string | null;
   clock_in: string;
   clock_out: string | null;
-  source: "self" | "manual";
+  source: "self" | "auto" | "manual";
   branch: number | null;
   note: string;
   minutes: number;
@@ -933,7 +933,7 @@ export interface AttendanceRecord {
   in_local: string;
   out_local: string | null;
   branch: number | null;
-  source: "self" | "manual";
+  source: "self" | "auto" | "manual";
   note: string;
   edit_reason: string;
   minutes: number;

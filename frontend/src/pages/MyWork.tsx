@@ -78,6 +78,7 @@ export function MyClock({ me, reload, compact = false }: { me: MyStaff; reload: 
           </span>
         )}
       </div>
+      {open?.source === "auto" && <p className="small muted">{t("pr.my.autoIn", { time: open.in })}</p>}
       {d.late_minutes > 0 && <p className="late-badge">{t("pr.my.lateNotice", { m: hm(d.late_minutes) })}</p>}
       {error && <p className="form-error" role="alert">{error}</p>}
       {compact && (
