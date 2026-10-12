@@ -120,7 +120,7 @@ Every demo login uses the password `Demo-pass-2026` (the owner, `amin`, keeps hi
 | karim | Dentist, Nasr City | Patients, calendar, charts, plans, notes, prescriptions, lab orders |
 | salma | Dentist, both branches | The same, at both branches |
 | youssef | Dentist, Heliopolis (implants) | The same; paid by commission only |
-| mariam | Receptionist, Nasr City | Patients, appointments, invoices, payments, cashbox. Not clocked in yet today: sign in as her to see the automatic clock-in |
+| mariam | Receptionist, Nasr City | Patients, appointments, invoices, payments, cashbox. Not clocked in yet today: sign in as her during her shift to see the automatic clock-in |
 | hana | Receptionist, Heliopolis | The same at Heliopolis |
 | aya | Dental assistant | Schedule, charts (read only), recording stock used |
 | omar | Dental assistant, Heliopolis | The same; paid by the hour |
@@ -130,7 +130,7 @@ Every demo login uses the password `Demo-pass-2026` (the owner, `amin`, keeps hi
 | mostafa | Lab technician, part time | Lab board |
 | sherif | Store keeper (extra role) | Stock, suppliers, purchase orders |
 
-Signing in clocks staff in for the day (once a day, not when they are on approved leave, and only for logins linked to a staff profile). Clocking out stays a button on the home page and My work; signing out does not clock out.
+Signing in during a rostered shift (from two hours before it starts until it ends) clocks staff in for the day (once a day, not when they are on approved leave, and only for logins linked to a staff profile). Clocking out stays a button on the home page and My work; signing out does not clock out.
 
 ## Run it for development
 
