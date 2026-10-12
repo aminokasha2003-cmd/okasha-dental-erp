@@ -159,7 +159,11 @@ class RosterEntry(ClinicScopedModel):
 
 
 class AttendanceRecord(ClinicScopedModel):
-    SOURCES = [("self", _("Clocked by the staff member")), ("manual", _("Entered by a manager"))]
+    SOURCES = [
+        ("self", _("Clocked by the staff member")),
+        ("auto", _("Clocked in automatically at sign-in")),
+        ("manual", _("Entered by a manager")),
+    ]
 
     staff = models.ForeignKey("masterdata.StaffMember", on_delete=models.CASCADE, related_name="attendance")
     date = models.DateField(_("date"), help_text=_("The local day the record starts on."))

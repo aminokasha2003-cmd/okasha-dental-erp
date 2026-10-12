@@ -6,7 +6,7 @@ advance installments and social insurance, and prints payslips. Each person
 sees only their own pay unless their role allows more."""
 
 import importlib
-from datetime import timedelta
+from datetime import time, timedelta
 from decimal import Decimal
 
 from django.apps import apps
@@ -14,9 +14,10 @@ from django.utils import timezone
 
 from erp.billing.tests.test_phase3 import Phase3Base
 from erp.core.models import AuditEntry, Role
+from erp.core.tests.test_phase0 import PASSWORD
 from erp.masterdata.models import StaffMember
 
-from ..models import AttendanceRecord, SalaryAdvance
+from ..models import AttendanceRecord, RosterEntry, SalaryAdvance
 from ..services import add_months
 
 
@@ -171,18 +172,21 @@ class AttendanceTests(Phase6Base):
         self.assertTrue(any("Duplicate" in str(e.changes) for e in entries))
 
     def test_self_clock_in_and_out(self):
-        self.login("assist")
+        self.login("assist")  # not rostered right now, so signing in does not clock her in
         me = self.client.get("/api/staff/me/").data
         self.assertEqual(me["staff"]["id"], self.nadia.id)
         self.assertIsNone(me["today"]["open_record"])
-        record = self.post("/api/staff/me/clock-in/", {})
-        self.assertEqual(record["source"], "self")
-        self.assertEqual(record["branch"], self.branch.id)  # her only branch
+        self.assertEqual(self.post("/api/staff/me/clock-in/", {})["source"], "self")
         self.post("/api/staff/me/clock-in/", {}, expect=400)  # no double clock-in
         self.assertEqual(self.client.get("/api/staff/me/").data["today"]["status"], "in")
         self.post("/api/staff/me/clock-out/", {}, expect=200)
         self.post("/api/staff/me/clock-out/", {}, expect=400)
-        self.assertEqual(AttendanceRecord.objects.filter(staff=self.nadia).count(), 1)
+        # Back from a break: the button clocks her in again.
+        record = self.post("/api/staff/me/clock-in/", {})
+        self.assertEqual(record["source"], "self")
+        self.assertEqual(record["branch"], self.branch.id)  # her only branch
+        self.post("/api/staff/me/clock-out/", {}, expect=200)
+        self.assertEqual(AttendanceRecord.objects.filter(staff=self.nadia).count(), 2)
         # A login without a staff profile cannot clock in.
         self.login("accounts")
         self.post("/api/staff/me/clock-in/", {}, expect=403)
@@ -190,6 +194,8 @@ class AttendanceTests(Phase6Base):
 
     def test_day_board_counts(self):
         today = self.today
+        # Signing in during set-up clocked Dr Sara in; start from an empty board.
+        AttendanceRecord.objects.filter(source="auto").delete()
         self.post("/api/staff/roster/", {"staff": self.nadia.id, "date": str(today), "start_time": "00:00", "end_time": "23:59"})
         self.post("/api/staff/roster/", {"staff": self.rana.id, "date": str(today), "start_time": "23:58", "end_time": "23:59"})
         self.post("/api/staff/attendance/clock/", {"staff": self.hossam.id, "action": "in"})
@@ -376,7 +382,8 @@ class PermissionTests(Phase6Base):
         self.assertEqual(slip["line"]["staff"], self.rana.id)
         self.assertEqual(self.client.get(f"/api/staff/me/payslips/{nadia_line['id']}/").status_code, 404)
         self.assertEqual(self.client.get(f"/api/staff/payroll/lines/{rana_line['id']}/payslip/").status_code, 200)
-        self.post("/api/staff/me/clock-in/", {})
+        # She is not on a rostered shift here, so signing in never clocked her in.
+        self.assertFalse(AttendanceRecord.objects.filter(staff=self.rana).exists())
 
     def test_other_clinic_sees_nothing(self):
         self.make_run()
@@ -423,3 +430,82 @@ class DashboardTests(Phase6Base):
         commission = {r["staff"]["id"]: r["amount"] for r in data["commission"]}
         self.assertEqual(commission, {self.dentist.id: "840.00", self.dentist2.id: "100.00"})
         self.assertEqual(data["advances_outstanding"], "1000.00")
+
+
+class AutoClockInTests(Phase6Base):
+    """Signing in clocks a staff member in for the day; signing out does not clock out."""
+
+    def setUp(self):
+        super().setUp()
+        # Both are on shift right now (auto clock-in only happens during a rostered shift).
+        now = timezone.localtime()
+        start = (now - timedelta(hours=1)).time() if now.hour >= 1 else time(0, 0)
+        end = (now + timedelta(hours=3)).time()
+        for member in (self.nadia, self.rana):
+            RosterEntry.objects.create(clinic=self.clinic, staff=member, date=self.today, start_time=start, end_time=end)
+
+    def sign_in(self, username):
+        response = self.client.post("/api/auth/token/", {"username": username, "password": PASSWORD}, format="json")
+        self.assertEqual(response.status_code, 200, response.content)
+        return response.data
+
+    def test_sign_in_clocks_in_once(self):
+        AttendanceRecord.objects.filter(staff=self.nadia).delete()
+        data = self.sign_in("assist")
+        self.assertTrue(data["auto_clocked_in"])
+        self.assertTrue(data["access"])
+        record = AttendanceRecord.objects.get(staff=self.nadia)
+        self.assertEqual((record.source, record.date, record.clock_out), ("auto", self.today, None))
+        self.assertEqual(record.branch, self.branch)
+        self.assertEqual(record.created_by, self.user("assist"))  # the audit log names her
+        self.assertEqual(data["clock_in_time"], timezone.localtime(record.clock_in).strftime("%H:%M"))
+        # A second sign-in the same day adds nothing, even after clocking out.
+        self.assertFalse(self.sign_in("assist")["auto_clocked_in"])
+        record.clock_out = timezone.now()
+        record.save()
+        self.assertFalse(self.sign_in("assist")["auto_clocked_in"])
+        self.assertEqual(AttendanceRecord.objects.filter(staff=self.nadia).count(), 1)
+
+    def test_no_staff_profile_no_clock_in(self):
+        before = AttendanceRecord.objects.count()
+        data = self.sign_in("accounts")
+        self.assertFalse(data["auto_clocked_in"])
+        self.assertIsNone(data["clock_in"])
+        self.assertEqual(AttendanceRecord.objects.count(), before)
+
+    def test_on_approved_leave_no_clock_in(self):
+        AttendanceRecord.objects.filter(staff=self.rana).delete()
+        apps.get_model("staff", "LeaveRequest").objects.create(
+            clinic=self.clinic, staff=self.rana, kind="sick", start_date=self.today, end_date=self.today, status="approved"
+        )
+        self.assertFalse(self.sign_in("reception")["auto_clocked_in"])
+        self.assertFalse(AttendanceRecord.objects.filter(staff=self.rana).exists())
+        # A pending request does not count.
+        AttendanceRecord.objects.filter(staff=self.nadia).delete()
+        apps.get_model("staff", "LeaveRequest").objects.create(
+            clinic=self.clinic, staff=self.nadia, kind="annual", start_date=self.today, end_date=self.today
+        )
+        self.assertTrue(self.sign_in("assist")["auto_clocked_in"])
+
+    def test_not_on_shift_no_clock_in(self):
+        AttendanceRecord.objects.filter(staff=self.nadia).delete()
+        RosterEntry.objects.filter(staff=self.nadia).delete()
+        self.assertFalse(self.sign_in("assist")["auto_clocked_in"])
+        # A shift later today that starts more than two hours from now does not count either.
+        later = timezone.localtime() + timedelta(hours=3)
+        if later.date() == self.today:
+            RosterEntry.objects.create(
+                clinic=self.clinic, staff=self.nadia, date=self.today,
+                start_time=later.time(), end_time=(later + timedelta(hours=1)).time(),
+            )
+            self.assertFalse(self.sign_in("assist")["auto_clocked_in"])
+        self.assertFalse(AttendanceRecord.objects.filter(staff=self.nadia).exists())
+
+    def test_inactive_profile_and_wrong_password(self):
+        AttendanceRecord.objects.filter(staff=self.nadia).delete()
+        self.nadia.is_active = False
+        self.nadia.save()
+        self.assertFalse(self.sign_in("assist")["auto_clocked_in"])
+        response = self.client.post("/api/auth/token/", {"username": "reception", "password": "wrong"}, format="json")
+        self.assertEqual(response.status_code, 401)
+        self.assertFalse(AttendanceRecord.objects.filter(staff=self.nadia).exists())

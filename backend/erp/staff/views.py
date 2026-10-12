@@ -416,6 +416,39 @@ def clock_in(member, branch=None, source="self", note=""):
         )
 
 
+AUTO_CLOCK_IN_EARLY = timedelta(hours=2)
+
+
+def auto_clock_in(user):
+    """Clock a staff member in when they sign in during a rostered shift, once a day.
+    Nothing happens outside a shift, for a login without an active staff profile, for someone who already has a record
+    today (open or closed), or for someone on approved leave today. Returns the
+    new record or None."""
+    if not user.clinic_id:
+        return None
+    member = StaffMember.objects.filter(user=user, clinic=user.clinic_id, is_active=True).first()
+    if member is None:
+        return None
+    today = timezone.localdate()
+    if AttendanceRecord.objects.filter(staff=member, date=today).exists() or open_record(member):
+        return None
+    if LeaveRequest.objects.filter(staff=member, status="approved", start_date__lte=today, end_date__gte=today).exists():
+        return None
+    # Only during a rostered shift (from two hours before it starts until it ends),
+    # so checking reports at night or on a day off does not start a work day.
+    now = timezone.now()
+    if not any(
+        entry.start_at - AUTO_CLOCK_IN_EARLY <= now <= entry.end_at
+        for entry in RosterEntry.objects.filter(staff=member, date=today)
+    ):
+        return None
+    try:
+        return clock_in(member, source="auto", note="Clocked in automatically at sign-in")
+    except ValidationError:
+        # Someone else clocked them in at the same moment.
+        return None
+
+
 def clock_out(member):
     with transaction.atomic():
         StaffMember.objects.select_for_update().get(pk=member.pk)
