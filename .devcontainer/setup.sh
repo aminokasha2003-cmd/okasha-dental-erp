@@ -19,3 +19,7 @@ if [ ! -f "$PASSWORD_FILE" ]; then
   python -c "import secrets; print(secrets.token_urlsafe(9))" > "$PASSWORD_FILE"
 fi
 INITIAL_OWNER_USERNAME=amin INITIAL_OWNER_PASSWORD="$(cat "$PASSWORD_FILE")" python manage.py bootstrap
+
+# A demo clinic to try every screen with (only on a fresh database; it never
+# adds to a clinic that already has patients).
+python manage.py seed_demo --quiet

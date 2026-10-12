@@ -106,6 +106,32 @@ The look follows the approved Okasha design in `docs/design/` (colours, fonts, l
 - **Inventory and purchasing.** Stock per branch with lots and expiry dates, suppliers, purchase orders (draft, ordered, partly received, received) with a suggest button that drafts orders for everything at or below its reorder level, counts, waste and transfers between branches, materials used per procedure, and implant lot tracing (which patients got a given lot, and which lots a patient got). Costs show only to people allowed to approve or edit stock.
 - **Staff and payroll.** Pay settings for each person (monthly, daily, hourly or commission only), shift types and a weekly roster, clock in and out (staff clock themselves in from the home page or My work), lateness and overtime worked out against the roster, leave requests with balances, salary advances repaid from pay, and monthly payroll runs (draft, approved, paid) that pull in dentist commission from billing, social insurance and deductions, with printable payslips and a staff dashboard that exports to PDF. Income tax is entered by hand on each payslip.
 
+## Demo data
+
+`python manage.py seed_demo` fills the clinic with a working demo so every screen, chart and report has something in it: two branches (Nasr City and Heliopolis) with five chairs, 80 patients with Arabic and English names (some with allergies, diabetes or blood thinners), about six months of visits up to today plus the coming three weeks (today's chairs have people waiting and in the chair), charts, treatment plans, signed and unsigned visit notes, prescriptions and consents, invoices with cash, card, InstaPay and wallet payments, partial payments, installments (some overdue), cashbox closings, lab cases at every stage (rush, on hold, overdue, outsourced and remakes), suppliers, stock with lots and expiry dates (some about to expire, some below the reorder level), purchase orders in every status, implant lot tracing, and staff with a roster, two months of attendance, leave, a salary advance, two paid payrolls and a draft for this month.
+
+It runs once: on a clinic that already has patients it does nothing. `python manage.py seed_demo --reset` removes the clinic's records and the demo logins and builds the demo again; the owner's login and password are kept and other clinics are never touched. In a codespace the demo is loaded on first setup, and `bash .devcontainer/demo.sh` starts it again from scratch.
+
+Every demo login uses the password `Demo-pass-2026` (the owner, `amin`, keeps his own):
+
+| Login | Role | What they see |
+| --- | --- | --- |
+| amin | Owner | Everything |
+| karim | Dentist, Nasr City | Patients, calendar, charts, plans, notes, prescriptions, lab orders |
+| salma | Dentist, both branches | The same, at both branches |
+| youssef | Dentist, Heliopolis (implants) | The same; paid by commission only |
+| mariam | Receptionist, Nasr City | Patients, appointments, invoices, payments, cashbox. Not clocked in yet today: sign in as her to see the automatic clock-in |
+| hana | Receptionist, Heliopolis | The same at Heliopolis |
+| aya | Dental assistant | Schedule, charts (read only), recording stock used |
+| omar | Dental assistant, Heliopolis | The same; paid by the hour |
+| ahmed | Accountant | Billing, finance dashboard, commissions, payroll, staff, inventory reports |
+| hesham | Lab manager (extra role) and lab technician | Lab board, lab dashboard with costs, lab stock |
+| tarek | Lab technician | Lab board; on sick leave today, so signing in does not clock him in |
+| mostafa | Lab technician, part time | Lab board |
+| sherif | Store keeper (extra role) | Stock, suppliers, purchase orders |
+
+Signing in clocks staff in for the day (once a day, not when they are on approved leave, and only for logins linked to a staff profile). Clocking out stays a button on the home page and My work; signing out does not clock out.
+
 ## Run it for development
 
 You need Python 3.12+, Node 20+ and PostgreSQL 16.

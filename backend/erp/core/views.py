@@ -1,4 +1,5 @@
 from django.http import FileResponse
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -6,8 +7,10 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from . import rbac
+from . import audit, rbac
 from .api import AuditContextMixin, ClinicScopedViewSet, ModulePermission, require_clinic
 from .models import AuditEntry, Notification, Role, StoredFile, User
 from .serializers import (
@@ -19,6 +22,31 @@ from .serializers import (
     StoredFileSerializer,
     UserSerializer,
 )
+
+
+class LoginView(TokenObtainPairView):
+    """Sign in (JWT pair). A login linked to a staff profile is also clocked in
+    for the day, so attendance starts the moment someone opens the app."""
+
+    def post(self, request, *args, **kwargs):
+        from erp.staff.views import auto_clock_in  # noqa: PLC0415
+
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as exc:
+            raise InvalidToken(exc.args[0]) from exc
+        data = dict(serializer.validated_data)
+        # Logged as the person signing in (they are not authenticated yet on this request).
+        token = audit.set_context(serializer.user, audit.client_ip(request))
+        try:
+            record = auto_clock_in(serializer.user)
+        finally:
+            audit.reset_context(token)
+        data["auto_clocked_in"] = record is not None
+        data["clock_in"] = record.clock_in if record else None
+        data["clock_in_time"] = timezone.localtime(record.clock_in).strftime("%H:%M") if record else None
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class MetaView(APIView):
