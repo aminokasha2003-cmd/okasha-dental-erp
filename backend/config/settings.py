@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "erp.lab",
     "erp.inventory",
     "erp.staff",
+    "erp.compliance",
 ]
 
 MIDDLEWARE = [

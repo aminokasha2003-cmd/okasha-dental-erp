@@ -24,6 +24,9 @@ const WORK: NavItem[] = [
   { to: "/lab", label: "nav.lab", icon: "flask", module: "lab" },
   { to: "/inventory", label: "nav.inventory", icon: "box", module: "inventory" },
   { to: "/payroll", label: "nav.payroll", icon: "badge", module: "staff" },
+  { to: "/online-booking", label: "nav.onlineBooking", icon: "globe", module: "appointments" },
+  { to: "/compliance", label: "nav.compliance", icon: "shield", module: "compliance" },
+  { to: "/einvoices", label: "nav.einvoices", icon: "stamp", module: "einvoice" },
 ];
 
 const SETUP: NavItem[] = [
@@ -59,6 +62,17 @@ function useBadges() {
       if (can("staff"))
         get<{ pending_leave: number }>("/api/staff/summary/")
           .then((s) => setBadges((b) => ({ ...b, "/payroll": s.pending_leave })))
+          .catch(() => undefined);
+      if (can("compliance") || can("einvoice") || can("appointments"))
+        get<{ failed_unreviewed?: number; maintenance_overdue?: number; licences_expiring?: number; einvoice_ready?: number; einvoice_invalid?: number; online_waiting?: number }>("/api/compliance/summary/")
+          .then((s) =>
+            setBadges((b) => ({
+              ...b,
+              "/compliance": (s.failed_unreviewed ?? 0) + (s.maintenance_overdue ?? 0) + (s.licences_expiring ?? 0),
+              "/einvoices": (s.einvoice_ready ?? 0) + (s.einvoice_invalid ?? 0),
+              "/online-booking": s.online_waiting ?? 0,
+            })),
+          )
           .catch(() => undefined);
       if (can("clinical", "approve"))
         get<unknown[]>("/api/clinical/visit-notes/?unsigned=1")

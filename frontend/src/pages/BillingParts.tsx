@@ -1,10 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { ApiError, get, post } from "../api";
 import { useAuth } from "../auth";
 import { useI18n, type TKey } from "../i18n";
 import { Modal } from "../components/Crud";
 import { Icon } from "../components/Icon";
 import { escapeHtml, printDocument, useLetterhead } from "../components/print";
+import { qrSvg } from "../components/qr";
 import { fmtDate, money } from "../format";
 import type { BillableLine, BillingPatient, Invoice, PayMethod, Payment } from "../types";
 
@@ -39,6 +41,13 @@ export function usePrintBilling() {
   const patientText = (p: BillingPatient, date: string) =>
     [escapeHtml(personName(p, lang)), escapeHtml(p.file_number), escapeHtml(fmtDate(date, lang))].join(" · ");
 
+  /** The Tax Authority UUID and QR code, once the e-invoice is accepted. */
+  const etaPrint = (inv: Invoice) => {
+    const e = inv.eta;
+    if (!e || e.status !== "valid" || !e.uuid) return "";
+    return `<div style="display:flex;gap:14px;align-items:center;margin-top:18px;padding-top:12px;border-top:1px solid #ddd">${e.url ? qrSvg(e.url, 96, "#000000") : ""}<div style="font-size:11px;line-height:1.6"><strong>${escapeHtml(t("eta.printTitle"))}</strong><br/>${escapeHtml(t("eta.uuid"))}: <span dir="ltr" style="font-family:monospace">${escapeHtml(e.uuid)}</span>${e.simulated ? `<br/><em>${escapeHtml(t("eta.printSimulated"))}</em>` : ""}</div></div>`;
+  };
+
   const invoice = (inv: Invoice) => {
     const rows = inv.lines
       .map(
@@ -53,7 +62,7 @@ export function usePrintBilling() {
       lang,
       clinic: letterhead,
       patient: patientText(inv.patient_info, inv.issue_date),
-      body: `<table><thead><tr><th>${t("bill.item")}</th><th>${t("bill.qty")}</th><th style="text-align:end">${t("plan.price")}</th><th style="text-align:end">${t("plan.discount")}</th><th style="text-align:end">${t("bill.amount", { cur: currency })}</th></tr></thead><tbody>${rows}</tbody><tfoot>${sum(t("bill.subtotal"), money(inv.totals.subtotal, lang))}${Number(inv.discount) ? sum(t("bill.invoiceDiscount"), `−${money(inv.discount, lang)}`) : ""}${Number(inv.totals.tax) ? sum(t("bill.tax", { rate: inv.tax_rate }), money(inv.totals.tax, lang)) : ""}${sum(t("bill.total"), money(inv.totals.total, lang), true)}${sum(t("bill.paid"), money(inv.totals.paid, lang))}${sum(t("bill.balance"), money(inv.totals.balance, lang), true)}</tfoot></table>${inv.status === "void" ? `<p><strong>${escapeHtml(t("bill.voidStamp"))}</strong> ${escapeHtml(inv.void_reason)}</p>` : ""}${inv.notes ? `<p class="body">${escapeHtml(inv.notes)}</p>` : ""}`,
+      body: `<table><thead><tr><th>${t("bill.item")}</th><th>${t("bill.qty")}</th><th style="text-align:end">${t("plan.price")}</th><th style="text-align:end">${t("plan.discount")}</th><th style="text-align:end">${t("bill.amount", { cur: currency })}</th></tr></thead><tbody>${rows}</tbody><tfoot>${sum(t("bill.subtotal"), money(inv.totals.subtotal, lang))}${Number(inv.discount) ? sum(t("bill.invoiceDiscount"), `−${money(inv.discount, lang)}`) : ""}${Number(inv.totals.tax) ? sum(t("bill.tax", { rate: inv.tax_rate }), money(inv.totals.tax, lang)) : ""}${sum(t("bill.total"), money(inv.totals.total, lang), true)}${sum(t("bill.paid"), money(inv.totals.paid, lang))}${sum(t("bill.balance"), money(inv.totals.balance, lang), true)}</tfoot></table>${inv.status === "void" ? `<p><strong>${escapeHtml(t("bill.voidStamp"))}</strong> ${escapeHtml(inv.void_reason)}</p>` : ""}${inv.notes ? `<p class="body">${escapeHtml(inv.notes)}</p>` : ""}${etaPrint(inv)}`,
       footer: "",
     });
   };
@@ -404,6 +413,7 @@ export function InvoiceView({ invoice, onClose, onChanged }: { invoice: Invoice;
           </table>
         </div>
         {inv.status === "void" && <p className="notice">{t("bill.voidedBecause", { reason: inv.void_reason })}</p>}
+        {inv.eta && <EtaChip eta={inv.eta} />}
 
         {inv.installments.length > 0 && (
           <section className="subsection">
@@ -527,5 +537,37 @@ function InstallmentDialog({ invoice, onClose, onSaved }: { invoice: Invoice; on
         </div>
       </form>
     </Modal>
+  );
+}
+
+const ETA_PILL: Record<string, string> = {
+  draft: "pill pill-warn",
+  ready: "pill pill-ready",
+  submitted: "pill pill-update",
+  valid: "pill pill-ok",
+  invalid: "pill pill-warn",
+  rejected: "pill pill-warn",
+  cancelled: "pill pill-muted",
+};
+
+/** Where this invoice stands with the Tax Authority, with its QR code once accepted. */
+function EtaChip({ eta }: { eta: NonNullable<Invoice["eta"]> }) {
+  const { t } = useI18n();
+  const { can } = useAuth();
+  return (
+    <section className="eta-chip-row">
+      <div className="grow">
+        <p className="small">
+          <span className="muted">{t("eta.short")}</span> <span className={ETA_PILL[eta.status] ?? "pill"}>{t(`eta.st.${eta.status}` as TKey)}</span>
+          {eta.simulated && eta.uuid ? <span className="pill pill-muted tiny">{t("eta.simulated")}</span> : null}
+        </p>
+        {eta.uuid && <p className="mono tiny muted" dir="ltr">{eta.uuid}</p>}
+        {eta.errors.length > 0 && <p className="small muted">{eta.errors[0]}</p>}
+        {can("einvoice") && eta.status !== "valid" && <Link className="small" to="/einvoices">{t("eta.openQueue")}</Link>}
+      </div>
+      {eta.url && (
+        <a href={eta.url} target="_blank" rel="noreferrer" className="eta-mini-qr" title={t("eta.openPortal")} dangerouslySetInnerHTML={{ __html: qrSvg(eta.url, 72) }} />
+      )}
+    </section>
   );
 }
