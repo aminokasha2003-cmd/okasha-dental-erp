@@ -23,6 +23,8 @@ MODULES = {
     "lab": _("Lab"),
     "inventory": _("Inventory and purchasing"),
     "staff": _("Staff and payroll"),
+    "compliance": _("Compliance: sterilisation, equipment, licences"),
+    "einvoice": _("Tax e-invoicing"),
     "crm": _("CRM"),
     "reports": _("Reports"),
 }
@@ -49,6 +51,7 @@ DEFAULT_ROLES = {
             "clinical": ["view", "create", "edit", "approve"],
             "lab": VCE,
             "inventory": ["view"],
+            "compliance": VCE,
         },
     ),
     "receptionist": (
@@ -61,6 +64,7 @@ DEFAULT_ROLES = {
             "appointments": ALL[:4],
             "billing": VCE,
             "inventory": ["view"],
+            "crm": VCE,
         },
     ),
     "assistant": (
@@ -73,6 +77,7 @@ DEFAULT_ROLES = {
             "appointments": ["view"],
             "clinical": ["view"],
             "inventory": ["view", "create"],
+            "compliance": VCE,
         },
     ),
     "lab_technician": (
@@ -83,6 +88,7 @@ DEFAULT_ROLES = {
             "files": VCE,
             "lab": VCE,
             "inventory": ["view", "create"],
+            "compliance": ["view", "create"],
         },
     ),
     "accountant": (
@@ -94,6 +100,8 @@ DEFAULT_ROLES = {
             "inventory": ["view", "approve"],
             "staff": ["view", "create", "edit", "approve"],
             "reports": ["view"],
+            "einvoice": ALL,
+            "compliance": ["view"],
         },
     ),
 }

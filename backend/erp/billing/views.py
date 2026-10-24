@@ -49,7 +49,7 @@ def add_months(day, months):
 
 
 class InvoiceViewSet(ClinicScopedViewSet):
-    queryset = Invoice.objects.select_related("patient", "branch").prefetch_related(
+    queryset = Invoice.objects.select_related("patient", "branch", "eta_document").prefetch_related(
         "lines__dentist", "payments", Prefetch("installments", queryset=Installment.objects.prefetch_related("payments"))
     )
     serializer_class = InvoiceSerializer

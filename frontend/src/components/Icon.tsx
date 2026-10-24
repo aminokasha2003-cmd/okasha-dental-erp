@@ -34,6 +34,11 @@ const PATHS = {
   bolt: "M13 2L4 14h7l-1 8 9-12h-7z",
   trend: "M3 17l6-6 4 4 8-8M15 7h6v6",
   pie: "M12 3a9 9 0 1 0 9 9h-9zM15 3.5A9 9 0 0 1 20.5 9H15z",
+  alert: "M12 3l9.5 17h-19zM12 10v4M12 17h.01",
+  shield: "M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6zM8.5 12l2.5 2.5 4.5-5",
+  globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-5.5-3.5-9s1-6.5 3.5-9z",
+  stamp: "M4 21h16M5 17h14v-3a2 2 0 0 0-2-2h-3V9a3 3 0 1 0-4 0v3H7a2 2 0 0 0-2 2z",
+  copy: "M9 9h11v11H9zM5 15H4V4h11v1",
 } as const;
 
 export type IconName = keyof typeof PATHS;

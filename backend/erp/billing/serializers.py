@@ -71,12 +71,13 @@ class InvoiceSerializer(ClinicScopedSerializer):
     patient_info = serializers.SerializerMethodField()
     totals = serializers.SerializerMethodField()
     payment_status = serializers.ReadOnlyField()
+    eta = serializers.SerializerMethodField()
 
     class Meta:
         model = Invoice
         fields = [
             "id", "number", "patient", "patient_info", "branch", "issue_date", "status", "payment_status", "discount", "tax_rate",
-            "notes", "void_reason", "voided_at", "lines", "installments", "totals", "created_at",
+            "notes", "void_reason", "voided_at", "lines", "installments", "totals", "created_at", "eta",
         ]
         read_only_fields = ["id", "number", "status", "tax_rate", "void_reason", "voided_at", "created_at"]
 
@@ -85,6 +86,12 @@ class InvoiceSerializer(ClinicScopedSerializer):
 
     def get_totals(self, obj):
         return {k: money(getattr(obj, k)) for k in ("subtotal", "tax", "total", "paid", "balance")}
+
+    def get_eta(self, obj):
+        """The Tax Authority e-invoice status, UUID and link (phase 8), when there is a document."""
+        from erp.compliance.services import eta_brief  # noqa: PLC0415
+
+        return eta_brief(obj, self.context)
 
 
 class ExtraLineSerializer(serializers.Serializer):

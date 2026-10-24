@@ -1,10 +1,12 @@
 """The demo clinic: one command fills every module, a second run adds nothing,
 --reset rebuilds it without touching the owner's password or other clinics."""
 
+import shutil
+import tempfile
 from io import StringIO
 
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from erp.appointments.models import Appointment
@@ -20,6 +22,14 @@ from erp.staff.models import AttendanceRecord, PayrollRun
 
 
 class SeedDemoTests(TestCase):
+    def setUp(self):
+        # The demo writes placeholder X-rays and documents; keep them out of the real media folder.
+        media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, media, ignore_errors=True)
+        override = override_settings(MEDIA_ROOT=media)
+        override.enable()
+        self.addCleanup(override.disable)
+
     def seed(self, *args):
         out = StringIO()
         call_command("seed_demo", "--quiet", *args, stdout=out)
@@ -31,13 +41,20 @@ class SeedDemoTests(TestCase):
         output = self.seed()
         self.assertIn("Demo clinic ready", output)
         first = counts(clinic)
-        self.assertEqual(first["patients"], 80)
+        self.assertEqual(first["patients"], 92)  # 80, plus 12 lapsed patients for the recall queue
         self.assertEqual(first["branches"], 2)
         self.assertEqual(first["users"], 13)
         for key in ("appointments", "appointments today", "treatment plans", "invoices", "payments", "installments",
-                    "lab cases", "stock movements", "purchase orders", "attendance records", "leave requests"):
+                    "lab cases", "stock movements", "purchase orders", "attendance records", "leave requests",
+                    "leads", "campaigns", "feedback", "patient files",
+                    "equipment", "work orders", "autoclave cycles", "packs used on patients", "e-invoices", "online requests"):
             self.assertGreater(first[key], 0, key)
         self.assertEqual(first["payroll runs"], 3)
+        from erp.compliance.models import BookingRequest, EInvoiceDocument, SterilizationCycle  # noqa: PLC0415
+
+        self.assertTrue(SterilizationCycle.objects.filter(clinic=clinic, result="fail").exists())
+        self.assertEqual(set(EInvoiceDocument.objects.filter(clinic=clinic).values_list("status", flat=True)) >= {"valid", "ready", "invalid"}, True)
+        self.assertTrue(BookingRequest.objects.filter(clinic=clinic, status="pending").exists())
         self.assertEqual(set(PayrollRun.objects.filter(clinic=clinic).values_list("status", flat=True)), {"paid", "draft"})
         # Every built-in role has someone, and the money adds up.
         self.assertFalse(clinic.roles.filter(users__isnull=True).exists())
@@ -56,7 +73,7 @@ class SeedDemoTests(TestCase):
         # --reset rebuilds the same clinic; the owner keeps his password, the other clinic is untouched.
         self.seed("--reset")
         again = counts(clinic)
-        self.assertEqual(again["patients"], 80)
+        self.assertEqual(again["patients"], 92)
         self.assertEqual(again["users"], 13)
         self.assertEqual(again["roles"], first["roles"])
         amin.refresh_from_db()

@@ -24,6 +24,11 @@ const WORK: NavItem[] = [
   { to: "/lab", label: "nav.lab", icon: "flask", module: "lab" },
   { to: "/inventory", label: "nav.inventory", icon: "box", module: "inventory" },
   { to: "/payroll", label: "nav.payroll", icon: "badge", module: "staff" },
+  { to: "/crm", label: "nav.crm", icon: "trend", module: "crm" },
+  { to: "/reports", label: "nav.reports", icon: "chart", module: "reports" },
+  { to: "/online-booking", label: "nav.onlineBooking", icon: "globe", module: "appointments" },
+  { to: "/compliance", label: "nav.compliance", icon: "shield", module: "compliance" },
+  { to: "/einvoices", label: "nav.einvoices", icon: "stamp", module: "einvoice" },
 ];
 
 const SETUP: NavItem[] = [
@@ -34,9 +39,7 @@ const SETUP: NavItem[] = [
   { to: "/audit", label: "nav.audit", icon: "history", module: "audit" },
 ];
 
-const LATER: NavItem[] = [
-  { to: "/crm", label: "nav.crm", icon: "chart" },
-];
+const LATER: NavItem[] = [];
 
 /** Small counts on the sidebar: patients waiting, notes to sign, lab work needing this user, stock to act on, leave to decide. */
 function useBadges() {
@@ -59,6 +62,21 @@ function useBadges() {
       if (can("staff"))
         get<{ pending_leave: number }>("/api/staff/summary/")
           .then((s) => setBadges((b) => ({ ...b, "/payroll": s.pending_leave })))
+          .catch(() => undefined);
+      if (can("crm"))
+        get<{ badge: number }>("/api/crm/summary/")
+          .then((s) => setBadges((b) => ({ ...b, "/crm": s.badge })))
+          .catch(() => undefined);
+      if (can("compliance") || can("einvoice") || can("appointments"))
+        get<{ failed_unreviewed?: number; maintenance_overdue?: number; licences_expiring?: number; einvoice_ready?: number; einvoice_invalid?: number; online_waiting?: number }>("/api/compliance/summary/")
+          .then((s) =>
+            setBadges((b) => ({
+              ...b,
+              "/compliance": (s.failed_unreviewed ?? 0) + (s.maintenance_overdue ?? 0) + (s.licences_expiring ?? 0),
+              "/einvoices": (s.einvoice_ready ?? 0) + (s.einvoice_invalid ?? 0),
+              "/online-booking": s.online_waiting ?? 0,
+            })),
+          )
           .catch(() => undefined);
       if (can("clinical", "approve"))
         get<unknown[]>("/api/clinical/visit-notes/?unsigned=1")
@@ -177,7 +195,7 @@ export function Layout() {
           {visible(WORK).map(link)}
           {visible(SETUP).length > 0 && <p className="nav-group">{t("group.setup")}</p>}
           {visible(SETUP).map(link)}
-          <p className="nav-group">{t("comingLater")}</p>
+          {LATER.length > 0 && <p className="nav-group">{t("comingLater")}</p>}
           {LATER.map((item) => (
             <span key={item.to} className="nav-link nav-disabled" aria-disabled="true" title={collapsed ? t(item.label) : undefined} style={{ "--i": index++ } as CSSProperties}>
               <span className="nav-icon">

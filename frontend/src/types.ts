@@ -322,6 +322,8 @@ export interface Invoice {
   installments: Installment[];
   totals: { subtotal: string; tax: string; total: string; paid: string; balance: string };
   created_at: string;
+  /** The Tax Authority e-invoice for this invoice, when e-invoicing is on. */
+  eta?: { status: string; uuid: string; url: string; simulated: boolean; errors: string[] } | null;
 }
 export interface Payment {
   id: number;

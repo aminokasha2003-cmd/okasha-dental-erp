@@ -22,6 +22,7 @@ import {
   useClinical,
 } from "./PatientClinical";
 import { BalanceStat, BillingCard, useAccount } from "./PatientBilling";
+import { PatientCrmCard } from "./CrmParts";
 import { LabCard } from "./LabParts";
 
 // Layout follows the approved patient card design (handoff in the project files).
@@ -187,6 +188,7 @@ export function PatientProfile() {
     { id: "prescriptions", label: "rx.title", show: clinicalOn },
     { id: "consents", label: "consent.title", show: clinicalOn },
     { id: "personal", label: "pt.personal", show: true },
+    { id: "crm", label: "crm.patientSection", show: can("crm") },
     { id: "files", label: "pt.files", show: can("files") },
     { id: "notes", label: "pt.staffNotes", show: true },
   ];
@@ -306,6 +308,7 @@ export function PatientProfile() {
           {clinicalOn && <PrescriptionsCard patient={patient} data={clinical} />}
           {clinicalOn && <ConsentsCard patient={patient} data={clinical} />}
           <PersonalCard patient={patient} branchName={choices.branches.find((b) => b.id === patient.home_branch)} dentistName={choices.dentists.find((d) => d.id === patient.preferred_dentist)} onEdit={can("patients", "edit") ? () => setEditing(true) : undefined} />
+          {can("crm") && <PatientCrmCard patientId={patient.id} />}
           {can("files") && <FilesCard key={filesVersion} patientId={patient.id} onCount={setFileCount} />}
           <NotesCard patient={patient} />
         </div>
