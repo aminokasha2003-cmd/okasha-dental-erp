@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_date
 from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -162,9 +162,13 @@ class StoredFileViewSet(ClinicScopedViewSet):
     @action(detail=True, methods=["get"])
     def download(self, request, pk=None):
         stored = self.get_object()
-        return FileResponse(
-            stored.file.open("rb"), as_attachment=False, filename=stored.original_name, content_type=stored.content_type_header
-        )
+        try:
+            handle = stored.file.open("rb")
+        except (FileNotFoundError, OSError, ValueError) as exc:
+            # The record is in the database but the file is not in storage (a database
+            # copied without its media folder, or a server whose disk was reset).
+            raise NotFound("This file is missing from the server's storage. Upload it again.") from exc
+        return FileResponse(handle, as_attachment=False, filename=stored.original_name, content_type=stored.content_type_header)
 
     def perform_destroy(self, instance):
         instance.file.delete(save=False)

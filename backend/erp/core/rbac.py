@@ -61,6 +61,7 @@ DEFAULT_ROLES = {
             "appointments": ALL[:4],
             "billing": VCE,
             "inventory": ["view"],
+            "crm": VCE,
         },
     ),
     "assistant": (

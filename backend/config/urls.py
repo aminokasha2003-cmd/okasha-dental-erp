@@ -28,6 +28,8 @@ urlpatterns = [
     path("api/lab/", include("erp.lab.urls")),
     path("api/inventory/", include("erp.inventory.urls")),
     path("api/staff/", include("erp.staff.urls")),
+    path("api/crm/", include("erp.crm.urls")),
+    path("api/reports/", include("erp.reports.urls")),
 ]
 
 # Must stay last: everything that is not the API, admin or a static file is the web app.

@@ -35,6 +35,7 @@ from erp.core import audit, rbac
 from erp.core.models import AuditEntry, Clinic, Notification, Role, StoredFile, User
 from erp.core.notifications import notify
 from erp.core.setup import create_clinic, create_default_roles
+from erp.crm import demo as crm_demo
 from erp.inventory import services as stock
 from erp.inventory.models import (
     ProcedureMaterial,
@@ -151,6 +152,7 @@ def wipe(clinic):
     included, password untouched) stay. Other clinics are not touched."""
     c = clinic
     with audit_paused():
+        crm_demo.wipe(c)
         AdvanceRepayment.objects.filter(advance__clinic=c).delete()
         PayrollItem.objects.filter(line__clinic=c).delete()
         for model in (PayrollLine, PayrollRun, SalaryAdvance, LeaveRequest, AttendanceRecord, RosterEntry,
@@ -1437,6 +1439,8 @@ class Seeder:
         self.staff_time()
         self.notifications()
         self.backdate()
+        self.out("Adding leads, recalls, campaigns, feedback and patient X-rays and documents…")
+        crm_demo.seed(self)
 
     def charts(self):
         r = self.rng
@@ -1536,6 +1540,7 @@ def counts(clinic):
         "attendance records": AttendanceRecord.objects.filter(clinic=c).count(),
         "leave requests": LeaveRequest.objects.filter(clinic=c).count(),
         "payroll runs": PayrollRun.objects.filter(clinic=c).count(),
+        **crm_demo.counts(c),
     }
 
 

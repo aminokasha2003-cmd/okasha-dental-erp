@@ -1,11 +1,14 @@
 import type { ReactNode } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "./auth";
 import { useI18n } from "./i18n";
 import { Layout } from "./components/Layout";
 import { Audit } from "./pages/Audit";
 import { NoAccess } from "./pages/ComingSoon";
 import { Billing } from "./pages/Billing";
+import { Crm } from "./pages/Crm";
+import { FeedbackPublic } from "./pages/FeedbackPublic";
+import { Reports } from "./pages/Reports";
 import { Lab } from "./pages/Lab";
 import { Inventory } from "./pages/Inventory";
 import { Payroll } from "./pages/Payroll";
@@ -29,6 +32,9 @@ function Guard({ module, children }: { module: string; children: ReactNode }) {
 export function App() {
   const { me, loading } = useAuth();
   const { t } = useI18n();
+  const { pathname } = useLocation();
+  const feedback = pathname.match(/^\/feedback\/([^/]+)\/?$/);
+  if (feedback) return <FeedbackPublic token={decodeURIComponent(feedback[1])} />;
   if (loading) return <p className="pad muted">{t("loading")}</p>;
   if (!me) return <Login />;
   return (
@@ -48,6 +54,9 @@ export function App() {
         <Route path="lab" element={<Guard module="lab"><Lab /></Guard>} />
         <Route path="inventory" element={<Guard module="inventory"><Inventory /></Guard>} />
         <Route path="payroll" element={<Guard module="staff"><Payroll /></Guard>} />
+        <Route path="crm" element={<Guard module="crm"><Crm /></Guard>} />
+        <Route path="reports" element={<Guard module="reports"><Reports /></Guard>} />
+        <Route path="reports/:key" element={<Guard module="reports"><Reports /></Guard>} />
         <Route path="my-work" element={<MyWork />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

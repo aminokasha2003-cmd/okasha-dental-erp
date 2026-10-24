@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 from django.db import transaction
-from django.db.models import Exists, Max, OuterRef, Q
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 from rest_framework.decorators import action
@@ -10,7 +9,6 @@ from rest_framework.response import Response
 
 from erp.core.api import ClinicScopedViewSet
 from erp.masterdata.models import Branch
-from erp.patients.models import Patient
 
 from .models import Appointment
 from erp.core.notifications import notify
@@ -118,35 +116,35 @@ class AppointmentViewSet(ClinicScopedViewSet):
 
     @action(detail=False, methods=["get"])
     def recalls(self, request):
-        """Patients due for a check-up: last finished visit over N months ago and nothing booked since."""
-        try:
-            months = min(max(int(request.query_params.get("months", 6)), 1), 36)
-        except ValueError as exc:
-            raise ValidationError({"months": "Give a number of months."}) from exc
-        now = timezone.now()
-        cutoff = now - timedelta(days=round(months * 30.4))
-        patients = (
-            Patient.objects.filter(clinic=request.user.clinic, is_active=True)
-            .annotate(last_visit=Max("appointments__start", filter=Q(appointments__status="completed")))
-            .filter(last_visit__lt=cutoff)
-            .exclude(Exists(Appointment.objects.filter(patient=OuterRef("pk"), start__gte=now, status__in=("booked", "confirmed"))))
-            .order_by("last_visit")
-        )
-        total = patients.count()
-        rows = []
-        for p in patients[:30]:
+        """Patients due back now (the home page widget). The CRM recall queue decides:
+        the clinic's recall rules (a check-up six months after the last visit, implant
+        and ortho reviews...), minus anyone already booked, snoozed or who declined."""
+        from erp.crm.services import recall_queue  # noqa: PLC0415  (CRM builds on appointments)
+
+        rows = [r for r in recall_queue(request.user.clinic, horizon=0) if r["due"] <= timezone.localdate()]
+        seen, people = set(), []
+        for r in sorted(rows, key=lambda r: r["last_visit"] or r["anchor"]):
+            if r["patient"].pk in seen:
+                continue
+            seen.add(r["patient"].pk)
+            people.append(r)
+        out = []
+        for r in people[:30]:
+            p = r["patient"]
             last = p.appointments.filter(status="completed").select_related("procedure").order_by("-start").first()
-            rows.append({
+            out.append({
                 "id": p.pk,
                 "ar": p.name_ar,
                 "en": p.name_en,
                 "phone": p.phone,
                 "whatsapp": p.whatsapp_opt_in,
                 "language": p.language,
-                "last_visit": p.last_visit,
+                "last_visit": r["last_visit"],
+                "due_date": r["due"],
+                "rule": {"en": r["rule"].name_en, "ar": r["rule"].name_ar},
                 "last_procedure": {"en": last.procedure.name_en, "ar": last.procedure.name_ar} if last and last.procedure else None,
             })
-        return Response({"count": total, "months": months, "results": rows})
+        return Response({"count": len(people), "months": 6, "results": out})
 
     @action(detail=True, methods=["post"])
     def remind(self, request, pk=None):
