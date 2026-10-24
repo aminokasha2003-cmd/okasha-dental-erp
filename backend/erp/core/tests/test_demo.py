@@ -46,9 +46,15 @@ class SeedDemoTests(TestCase):
         self.assertEqual(first["users"], 13)
         for key in ("appointments", "appointments today", "treatment plans", "invoices", "payments", "installments",
                     "lab cases", "stock movements", "purchase orders", "attendance records", "leave requests",
-                    "leads", "campaigns", "feedback", "patient files"):
+                    "leads", "campaigns", "feedback", "patient files",
+                    "equipment", "work orders", "autoclave cycles", "packs used on patients", "e-invoices", "online requests"):
             self.assertGreater(first[key], 0, key)
         self.assertEqual(first["payroll runs"], 3)
+        from erp.compliance.models import BookingRequest, EInvoiceDocument, SterilizationCycle  # noqa: PLC0415
+
+        self.assertTrue(SterilizationCycle.objects.filter(clinic=clinic, result="fail").exists())
+        self.assertEqual(set(EInvoiceDocument.objects.filter(clinic=clinic).values_list("status", flat=True)) >= {"valid", "ready", "invalid"}, True)
+        self.assertTrue(BookingRequest.objects.filter(clinic=clinic, status="pending").exists())
         self.assertEqual(set(PayrollRun.objects.filter(clinic=clinic).values_list("status", flat=True)), {"paid", "draft"})
         # Every built-in role has someone, and the money adds up.
         self.assertFalse(clinic.roles.filter(users__isnull=True).exists())

@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { complianceAr, complianceEn } from "./i18n.compliance";
 
 export type Lang = "en" | "ar";
 
@@ -1723,6 +1724,7 @@ const en = {
   "pr.my.noLeave": "No leave requests yet.",
   "pr.my.withdraw": "Withdraw",
   "pr.my.noPayslips": "Payslips show here once payroll is approved.",
+  ...complianceEn,
 };
 
 type Key = keyof typeof en;
@@ -3440,6 +3442,7 @@ const ar: Record<Key, string> = {
   "pr.my.noLeave": "مفيش طلبات إجازة لسه.",
   "pr.my.withdraw": "اسحب الطلب",
   "pr.my.noPayslips": "القسائم بتظهر هنا بعد اعتماد الرواتب.",
+  ...complianceAr,
 };
 
 const dictionaries: Record<Lang, Record<Key, string>> = { en, ar };
@@ -3459,6 +3462,8 @@ const MODULE_NAMES: Record<string, Record<Lang, string>> = {
   staff: { en: "Staff and payroll", ar: "الموظفون والرواتب" },
   crm: { en: "CRM", ar: "إدارة العملاء" },
   reports: { en: "Reports", ar: "التقارير" },
+  compliance: { en: "Compliance (sterilisation, equipment, licences)", ar: "الجودة (التعقيم والأجهزة والتراخيص)" },
+  einvoice: { en: "Tax Authority e-invoices", ar: "الفاتورة الإلكترونية" },
 };
 
 export type TKey = Key;

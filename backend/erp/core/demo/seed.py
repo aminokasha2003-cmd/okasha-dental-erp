@@ -22,6 +22,7 @@ from rest_framework.exceptions import ValidationError as ApiValidationError
 from erp.appointments.models import Appointment
 from erp.billing.models import CashboxClosing, DocumentCounter, Installment, Invoice, InvoiceLine, Payment
 from erp.clinical.defaults import ensure_starter_consents
+from erp.compliance import demo as compliance_demo
 from erp.clinical.models import (
     ConsentTemplate,
     PatientConsent,
@@ -153,6 +154,7 @@ def wipe(clinic):
     c = clinic
     with audit_paused():
         crm_demo.wipe(c)
+        compliance_demo.wipe(c)
         AdvanceRepayment.objects.filter(advance__clinic=c).delete()
         PayrollItem.objects.filter(line__clinic=c).delete()
         for model in (PayrollLine, PayrollRun, SalaryAdvance, LeaveRequest, AttendanceRecord, RosterEntry,
@@ -1441,6 +1443,8 @@ class Seeder:
         self.backdate()
         self.out("Adding leads, recalls, campaigns, feedback and patient X-rays and documents…")
         crm_demo.seed(self)
+        self.out("Adding equipment, sterilisation, e-invoices and online bookings…")
+        compliance_demo.seed(self)
 
     def charts(self):
         r = self.rng
@@ -1541,6 +1545,7 @@ def counts(clinic):
         "leave requests": LeaveRequest.objects.filter(clinic=c).count(),
         "payroll runs": PayrollRun.objects.filter(clinic=c).count(),
         **crm_demo.counts(c),
+        **compliance_demo.counts(c),
     }
 
 

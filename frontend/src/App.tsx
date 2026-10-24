@@ -23,6 +23,10 @@ import { Procedures } from "./pages/Procedures";
 import { Settings } from "./pages/Settings";
 import { Staff } from "./pages/Staff";
 import { Users } from "./pages/Users";
+import { Compliance } from "./pages/Compliance";
+import { EInvoices } from "./pages/EInvoices";
+import { OnlineBooking } from "./pages/OnlineBooking";
+import { PublicBooking } from "./pages/PublicBooking";
 
 function Guard({ module, children }: { module: string; children: ReactNode }) {
   const { can } = useAuth();
@@ -35,6 +39,8 @@ export function App() {
   const { pathname } = useLocation();
   const feedback = pathname.match(/^\/feedback\/([^/]+)\/?$/);
   if (feedback) return <FeedbackPublic token={decodeURIComponent(feedback[1])} />;
+  // The public booking page needs no login.
+  if (window.location.pathname.startsWith("/book/")) return <PublicBooking />;
   if (loading) return <p className="pad muted">{t("loading")}</p>;
   if (!me) return <Login />;
   return (
@@ -57,6 +63,9 @@ export function App() {
         <Route path="crm" element={<Guard module="crm"><Crm /></Guard>} />
         <Route path="reports" element={<Guard module="reports"><Reports /></Guard>} />
         <Route path="reports/:key" element={<Guard module="reports"><Reports /></Guard>} />
+        <Route path="compliance" element={<Guard module="compliance"><Compliance /></Guard>} />
+        <Route path="einvoices" element={<Guard module="einvoice"><EInvoices /></Guard>} />
+        <Route path="online-booking" element={<Guard module="appointments"><OnlineBooking /></Guard>} />
         <Route path="my-work" element={<MyWork />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

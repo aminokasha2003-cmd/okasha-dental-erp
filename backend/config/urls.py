@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.http import FileResponse, Http404, JsonResponse
 from django.urls import include, path, re_path
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 
 def health(request):
@@ -30,6 +31,10 @@ urlpatterns = [
     path("api/staff/", include("erp.staff.urls")),
     path("api/crm/", include("erp.crm.urls")),
     path("api/reports/", include("erp.reports.urls")),
+    path("api/compliance/", include("erp.compliance.urls")),
+    path("api/public/booking/", include("erp.compliance.public_urls")),
+    # The public booking page may be shown inside the clinic's own website (iframe).
+    re_path(r"^book/", xframe_options_exempt(web_app)),
 ]
 
 # Must stay last: everything that is not the API, admin or a static file is the web app.
